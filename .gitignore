@@ -1,0 +1,17 @@
+node_modules
+dist
+dist-ssr
+.env
+.env.*
+!.env.example
+*.local
+.DS_Store
+.vite
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+test-results
+playwright-report
+
+# Screenshots written by scripts/VerifyAssets.mjs
+verify-*.png

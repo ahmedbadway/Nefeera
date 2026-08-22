@@ -1,0 +1,59 @@
+/**
+ * Brand tokens.
+ *
+ * WHY EACH COLOR IS DEFINED TWICE:
+ * The first block stores the BARE OKLCH COMPONENTS (no `oklch(...)` wrapper).
+ * tailwind.config.js wraps them as `oklch(var(--cream) / <alpha-value>)`, which
+ * is what lets opacity utilities like `bg-charcoal/50` and `text-cream/80`
+ * actually composite. A pre-wrapped `var(--color-cream)` cannot do that — the
+ * alpha has nowhere to go, and every `/opacity` utility on the site would
+ * silently render at full strength.
+ *
+ * The second block is the same colors pre-wrapped, for plain CSS in Global.css
+ * and for inline styles in Logo.jsx, where no Tailwind utility is involved.
+ *
+ * Keep both in parity with src/data/Tokens.js, which holds the palette as hex
+ * for the standalone placeholder SVG files.
+ *
+ * Browser baseline: OKLCH ships in Chrome 111+, Safari 15.4+, and Firefox 113+.
+ * There is deliberately no hex fallback — a fallback cannot express the bare
+ * component syntax above, so a broken one would be worse than none.
+ */
+
+:root {
+  /* Bare OKLCH components — consumed by Tailwind with an alpha channel. */
+  --cream: 92.77% 0.0154 77.07; /* #EDE6DC */
+  --warm-white: 97.73% 0.0062 75.41; /* #FAF7F3 */
+  --gold: 66.28% 0.0908 80.47; /* #B08D4F */
+  --charcoal: 28.91% 0 89.88; /* #2B2B2B */
+
+  /* Scoped to FeaturedWedding only — never nav, buttons, links, or footer. */
+  --burgundy: 32.95% 0.0968 8.66; /* #5C1A2B */
+
+  /* Supporting tints */
+  --gold-soft: 74.94% 0.0885 83.12; /* #C9A96B */
+  --cream-deep: 89.2% 0.0201 77.31; /* #E3DACD */
+  --charcoal-muted: 51.07% 0.0109 62.43; /* #6B6560 */
+
+  /* Resolved colors, for plain CSS and inline styles. */
+  --color-cream: oklch(var(--cream));
+  --color-warm-white: oklch(var(--warm-white));
+  --color-gold: oklch(var(--gold));
+  --color-charcoal: oklch(var(--charcoal));
+  --color-burgundy: oklch(var(--burgundy));
+  --color-gold-soft: oklch(var(--gold-soft));
+  --color-cream-deep: oklch(var(--cream-deep));
+  --color-charcoal-muted: oklch(var(--charcoal-muted));
+
+  /* Motion curves — from the Emil Kowalski motion system.
+     The built-in CSS easings are too weak to read as intentional. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Layout rhythm */
+  --shell-max: 1440px;
+  --gutter: clamp(1.25rem, 5vw, 5.5rem);
+
+  color-scheme: light;
+}
