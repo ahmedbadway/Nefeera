@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A newer push to the same branch cancels the older run — no point spending
+# runner minutes finishing a check on a commit that has been superseded.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, build, and asset sync
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # --include=dev is explicit rather than redundant: some environments set
+      # NODE_ENV=production or `omit=dev`, which silently skips devDependencies
+      # and leaves vite and tailwind missing. Being explicit costs nothing and
+      # removes a confusing class of failure.
+      - name: Install dependencies
+        run: npm ci --include=dev
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # public/assets/placeholders/*.svg and public/assets/README.md are both
+      # generated from `assetSpecs` in src/data/Content.js. If someone changes a
+      # slot's dimensions without regenerating, the upload instructions would
+      # start telling the client the wrong pixel size. Regenerating and checking
+      # for a diff is what stops that from shipping.
+      - name: Check generated assets are in sync with Content.js
+        run: |
+          npm run assets
+          if ! git diff --quiet -- public/assets; then
+            echo "::error::public/assets is out of sync with assetSpecs in src/data/Content.js."
+            echo "Run 'npm run assets' locally and commit the result."
+            git diff --stat -- public/assets
+            git diff -- public/assets
+            exit 1
+          fi
+          echo "Placeholders and upload README match the specs."
+
+  verify-assets:
+    name: Asset-swap verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --include=dev
+
+      # Playwright is a verification tool, not a project dependency, so it is
+      # installed here rather than added to package.json. scripts/VerifyAssets.mjs
+      # resolves it locally first, then globally.
+      - name: Install Playwright and Chromium
+        run: |
+          npm install -g playwright@1.56.1
+          npx playwright install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+
+      - name: Start preview server
+        run: |
+          nohup npx vite preview --port 4173 --strictPort > preview.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://localhost:4173/; then
+              echo "Preview server is up."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::Preview server did not start within 60s."
+          cat preview.log || true
+          exit 1
+
+      # Proves the whole point of the asset system: with no real files present
+      # every slot shows a labeled placeholder and no <video> element exists,
+      # and dropping real files in at spec dimensions moves nothing on the page.
+      - name: Verify asset swap and zero layout shift
+        run: node scripts/VerifyAssets.mjs --base http://localhost:4173
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-screenshots
+          path: verify-*.png
+          if-no-files-found: warn
+          retention-days: 14
