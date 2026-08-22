@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { resolveAssetPath } from "./ResolveAssetPath.js";
 
 /**
  * Does a file actually exist at this path?
@@ -53,7 +54,9 @@ export function probeAsset(path) {
     if (typeof fetch !== "function") return false;
 
     try {
-      const response = await fetch(path, {
+      // Cache keys and returned values stay logical; only the request itself is
+      // resolved against the deployment base. See ResolveAssetPath.js.
+      const response = await fetch(resolveAssetPath(path), {
         method: "HEAD",
         cache: "force-cache",
       });

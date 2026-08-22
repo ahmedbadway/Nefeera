@@ -77,9 +77,14 @@ jobs:
       # Installed locally rather than with -g on purpose: scripts/VerifyAssets.mjs
       # resolves via createRequire, which only walks node_modules upward and
       # cannot see a global install without being pointed at the global root.
+      #
+      # --include=dev is repeated here because this install re-resolves the whole
+      # tree. Under a config that omits dev dependencies it would otherwise prune
+      # vite and tailwind right back out, and the build two steps down would fail
+      # with "vite: not found".
       - name: Install Playwright and Chromium
         run: |
-          npm install --no-save --no-package-lock playwright@1.56.1
+          npm install --include=dev --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chromium
 
       - name: Build
@@ -89,7 +94,7 @@ jobs:
         run: |
           nohup npx vite preview --port 4173 --strictPort > preview.log 2>&1 &
           for i in $(seq 1 60); do
-            if curl -sf -o /dev/null http://localhost:4173/; then
+            if curl -sf -o /dev/null http://localhost:4173/Nefeera/; then
               echo "Preview server is up."
               exit 0
             fi
@@ -103,7 +108,7 @@ jobs:
       # every slot shows a labeled placeholder and no <video> element exists,
       # and dropping real files in at spec dimensions moves nothing on the page.
       - name: Verify asset swap and zero layout shift
-        run: node scripts/VerifyAssets.mjs --base http://localhost:4173
+        run: node scripts/VerifyAssets.mjs --base http://localhost:4173/Nefeera/
 
       - name: Upload screenshots
         if: always()

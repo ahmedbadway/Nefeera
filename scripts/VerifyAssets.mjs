@@ -89,8 +89,11 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const servedImagesDir = join(root, "dist", "assets", "images");
 
+// vite preview honours `base` from vite.config.js, so the app is served under
+// the project subpath rather than at the server root.
 const baseArgIndex = process.argv.indexOf("--base");
-const BASE = baseArgIndex > -1 ? process.argv[baseArgIndex + 1] : "http://localhost:4173";
+const BASE =
+  baseArgIndex > -1 ? process.argv[baseArgIndex + 1] : "http://localhost:4173/Nefeera/";
 
 const VIEWPORTS = [
   { name: "mobile", width: 375, height: 812 },
