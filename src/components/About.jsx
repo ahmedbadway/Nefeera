@@ -1,0 +1,95 @@
+import { content } from "../data/Content.js";
+import Asset from "./Asset.jsx";
+import Reveal from "./Reveal.jsx";
+import SectionHeading from "./SectionHeading.jsx";
+
+/**
+ * About section.
+ *
+ * Asymmetric 12-column split: the portrait takes five columns and sits slightly
+ * lower than the copy, which takes six starting at column seven. The uneven
+ * column count and the vertical offset are what keep it from reading as the
+ * standard 50/50 image-beside-text block.
+ */
+export default function About() {
+  const { about, assets } = content;
+
+  return (
+    <section
+      id="about"
+      aria-labelledby="about-heading"
+      className="relative bg-warm-white py-24 sm:py-32 lg:py-40"
+    >
+      <div className="shell">
+        <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
+          {/* Portrait */}
+          <div className="lg:col-span-5 lg:pt-16">
+            <Reveal>
+              <div className="relative">
+                <Asset
+                  src={assets.images.aboutYomna}
+                  ratio="4/5"
+                  label="About — Yomna"
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="w-full"
+                />
+                {/* Offset gold rule — a small anchor that stops the portrait
+                    floating free of the grid. */}
+                <span
+                  aria-hidden="true"
+                  className="absolute -bottom-6 start-0 block h-px w-24 bg-gold"
+                />
+              </div>
+            </Reveal>
+          </div>
+
+          {/* Copy */}
+          <div className="lg:col-span-6 lg:col-start-7">
+            <SectionHeading
+              id="about-heading"
+              eyebrow={about.eyebrow}
+              headline={about.headline}
+            />
+
+            <Reveal delay={0.1}>
+              <p className="mt-8 font-display text-[clamp(1.375rem,2.4vw,1.75rem)] leading-[1.4] text-charcoal">
+                {about.lead}
+              </p>
+            </Reveal>
+
+            <div className="mt-8 space-y-5">
+              {about.body.map((paragraph, index) => (
+                <Reveal key={paragraph.slice(0, 32)} delay={0.14 + index * 0.05}>
+                  <p className="text-[1.0625rem] leading-[1.8] text-charcoal-muted">
+                    {paragraph}
+                  </p>
+                </Reveal>
+              ))}
+            </div>
+
+            {/* Stats. Hairline dividers rather than boxes — three bordered cards
+                here would be exactly the template look this project avoids. */}
+            <Reveal delay={0.24}>
+              <h3 className="sr-only-focusable">{about.statsLabel}</h3>
+              <dl className="mt-14 grid grid-cols-1 gap-px overflow-hidden border-y border-gold/25 sm:grid-cols-3">
+                {about.stats.map((stat) => (
+                  <div
+                    key={stat.value}
+                    className="border-gold/25 py-7 pe-6 sm:border-e sm:last:border-e-0"
+                  >
+                    <dt className="font-display text-[1.5rem] leading-none text-charcoal">
+                      {stat.value}
+                    </dt>
+                    <dd className="mt-2.5 text-[0.8125rem] leading-relaxed text-charcoal-muted">
+                      {stat.label}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </Reveal>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
