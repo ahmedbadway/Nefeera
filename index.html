@@ -13,13 +13,25 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#EDE6DC" />
 
+    <!--
+      Open Graph URLs must be absolute — Facebook, WhatsApp, and X fetch them
+      from their own servers, where a site-relative path means nothing. Vite
+      rewrites src/href attributes for the deployment base but not meta content,
+      so these carry the full origin.
+
+      UPDATE BOTH IF THE DOMAIN CHANGES (custom domain, Vercel, Netlify).
+    -->
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ahmedbadway.github.io/Nefeera/" />
     <meta property="og:title" content="Nefeera — Wedding Planning &amp; Design by Yomna El Hadad" />
     <meta
       property="og:description"
       content="Full wedding planning, design direction, and day-of production across Egypt. A small number of couples each season."
     />
-    <meta property="og:image" content="/assets/images/hero-poster.jpg" />
+    <meta
+      property="og:image"
+      content="https://ahmedbadway.github.io/Nefeera/assets/images/hero-poster.jpg"
+    />
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />

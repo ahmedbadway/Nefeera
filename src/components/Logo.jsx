@@ -1,5 +1,6 @@
 import { content } from "../data/Content.js";
 import { useFirstAvailableAsset } from "../utils/AssetProbe.js";
+import { resolveAssetPath } from "../utils/ResolveAssetPath.js";
 
 /**
  * The Nefeera lockup, drawn in code.
@@ -115,7 +116,7 @@ export default function Logo({
   if (uploaded.status === "present" && uploaded.src) {
     return (
       <img
-        src={uploaded.src}
+        src={resolveAssetPath(uploaded.src)}
         alt={accessibleName}
         className={`block w-auto ${className}`}
         style={{ height: `calc(${scale.mark} + ${scale.wordmark} * 2.2)` }}

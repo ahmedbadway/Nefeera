@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# REPOSITORY SETTING REQUIRED, ONCE:
+# Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+# While it is still set to "Deploy from a branch", Pages publishes the repo root
+# with no build step, which serves index.html pointing at /src/main.jsx — a Vite
+# dev entry a browser cannot execute, so the page renders blank.
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time. cancel-in-progress is false on purpose: cancelling a
+# half-finished deploy can leave the live site in a partial state.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --include=dev
+
+      # base is /Nefeera/ by default (see vite.config.js) because project Pages
+      # serve from a subpath. Moving to a root domain later means building with
+      # BASE_PATH=/ instead.
+      - name: Build
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { getAssetSpec, getAssetRequirementLabel, getAssetFilename } from "../data/Content.js";
 import { buildPlaceholderSvg } from "../utils/PlaceholderSvg.js";
+import { resolveAssetPath } from "../utils/ResolveAssetPath.js";
 
 /**
  * A swappable image slot.
@@ -96,7 +97,9 @@ export default function Asset({
 
       {hasSource && status !== "error" ? (
         <img
-          src={src}
+          // `src` stays logical for the assetSpecs lookups above; only the URL
+          // handed to the browser is joined to the deployment base.
+          src={resolveAssetPath(src)}
           alt={resolvedAlt}
           sizes={sizes}
           width={spec.w || undefined}

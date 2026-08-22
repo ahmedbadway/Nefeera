@@ -30,15 +30,38 @@
  */
 
 import { createRequire } from "node:module";
+import { execSync } from "node:child_process";
 import { mkdirSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 import { assetSpecs, getAssetFilename } from "../src/data/Content.js";
 
-/** Resolve Playwright from a local install, then from the global one. */
+/** Where `npm install -g` puts packages on this machine, if npm can say. */
+function globalNodeModules() {
+  try {
+    return execSync("npm root -g", {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Resolve Playwright from a local install first, then from the global one.
+ *
+ * The global path is looked up with `npm root -g` rather than hardcoded:
+ * createRequire only walks node_modules upward from the file you give it, so a
+ * globally installed package is invisible to it unless you point it at the
+ * global root explicitly, and that root differs per machine and per CI runner.
+ */
 function loadPlaywright() {
-  const candidates = [import.meta.url, "/opt/node22/lib/node_modules/"];
+  const globalRoot = globalNodeModules();
+  const candidates = [import.meta.url];
+  if (globalRoot) candidates.push(join(globalRoot, "resolve-from-here.js"));
+
   for (const from of candidates) {
     try {
       return createRequire(from)("playwright");
@@ -46,8 +69,10 @@ function loadPlaywright() {
       // Try the next location.
     }
   }
+
   console.error(
-    "Playwright not found. Install it with:\n" +
+    "Playwright not found. Install it with either:\n" +
+      "  npm install --no-save playwright && npx playwright install chromium\n" +
       "  npm install -g playwright && npx playwright install chromium"
   );
   process.exit(1);
@@ -64,8 +89,11 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const servedImagesDir = join(root, "dist", "assets", "images");
 
+// vite preview honours `base` from vite.config.js, so the app is served under
+// the project subpath rather than at the server root.
 const baseArgIndex = process.argv.indexOf("--base");
-const BASE = baseArgIndex > -1 ? process.argv[baseArgIndex + 1] : "http://localhost:4173";
+const BASE =
+  baseArgIndex > -1 ? process.argv[baseArgIndex + 1] : "http://localhost:4173/Nefeera/";
 
 const VIEWPORTS = [
   { name: "mobile", width: 375, height: 812 },

@@ -3,6 +3,7 @@ import { useReducedMotion } from "motion/react";
 import { getAssetSpec, getAssetRequirementLabel, getAssetFilename } from "../data/Content.js";
 import { buildPlaceholderSvg } from "../utils/PlaceholderSvg.js";
 import { probeAsset } from "../utils/AssetProbe.js";
+import { resolveAssetPath } from "../utils/ResolveAssetPath.js";
 import { useMediaQuery } from "../utils/UseMediaQuery.js";
 
 /**
@@ -165,7 +166,7 @@ export default function VideoAsset({
 
       {showPoster ? (
         <img
-          src={poster}
+          src={resolveAssetPath(poster)}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover"
@@ -182,13 +183,17 @@ export default function VideoAsset({
           loop
           playsInline
           preload="metadata"
-          poster={available?.poster ? poster : undefined}
+          poster={available?.poster ? resolveAssetPath(poster) : undefined}
           aria-hidden="true"
           tabIndex={-1}
           onError={() => setPlaybackFailed(true)}
         >
           {sources.map((source) => (
-            <source key={source.src} src={source.src} type={source.type} />
+            <source
+              key={source.src}
+              src={resolveAssetPath(source.src)}
+              type={source.type}
+            />
           ))}
         </video>
       ) : null}
