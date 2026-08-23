@@ -68,10 +68,15 @@ export default function Hero() {
         className="absolute inset-0"
         style={{ transform: applyParallax ? parallaxTransform : "none" }}
       >
+        {/* One file at every width. A second portrait cut would double the
+            upload burden for the client and the bytes on the wire; the crop is
+            steered with object-position instead — biased to the upper-middle on
+            tall phone viewports so the subject is not cut off, centred from
+            768px up where the frame is close to the source ratio. */}
         <VideoAsset
           fill
+          objectPositionClass="object-[35%_15%] md:object-center"
           desktopSrc={assets.video.heroDesktop}
-          mobileSrc={assets.video.heroMobile}
           webmSrc={assets.video.heroWebm}
           poster={assets.images.heroPoster}
           label="Hero video"
@@ -80,18 +85,20 @@ export default function Hero() {
       </motion.div>
 
       {/* Scrim. Only meaningful over real footage — over the cream placeholder it
-          fades away so the panel keeps its warmth. Three layers: a base wash for
-          overall legibility, a top band so the transparent header stays readable,
-          and a bottom band under the copy. */}
+          fades away so the panel keeps its warmth.
+
+          Directional rather than flat: the copy sits at the inline start, so the
+          wash is heaviest there and thins out across the frame, leaving the
+          right-hand side of the footage genuinely visible. A second, softer
+          bottom gradient keeps the scroll cue and the buttons readable. */}
       <div
         aria-hidden="true"
         className={`absolute inset-0 transition-opacity duration-700 ease-out-strong ${
           hasDarkMedia ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="absolute inset-0 bg-charcoal/50" />
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/55 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/75 via-charcoal/45 to-charcoal/15" />
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent" />
       </div>
 
       {/* Content */}
