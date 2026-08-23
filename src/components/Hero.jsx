@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { motion, useMotionTemplate, useScroll, useTransform, useReducedMotion } from "motion/react";
 import { content } from "../data/Content.js";
-import { useHeroMedia } from "../utils/UseHeroMedia.js";
+import { useHeroMedia, reportHeroPlaybackFailed } from "../utils/UseHeroMedia.js";
 import VideoAsset from "./VideoAsset.jsx";
 import { WhatsAppIcon, ArrowIcon } from "./Icons.jsx";
 
@@ -35,11 +35,20 @@ export default function Hero() {
     offset: ["start start", "end start"],
   });
 
-  // Media drifts slower than the page. Scaled up so the translate never exposes
-  // an edge. Disabled entirely for reduced motion and when there is no footage —
+  // Media drifts slower than the page. It has to be scaled up a little so the
+  // translate never exposes an edge — but that scale is a SECOND enlargement on
+  // top of however much the video is already being stretched to cover the
+  // viewport, and it costs real sharpness.
+  //
+  // So both numbers are the geometric minimum rather than round ones: drifting
+  // 70px over a ~900px-tall hero needs 1 + 70/900 ≈ 1.08, not the 1.14 that was
+  // here before. On a 1440px screen that takes a 464px-wide source from a 3.54x
+  // enlargement down to 3.35x. Small, but free.
+  //
+  // Disabled entirely for reduced motion and when there is no footage —
   // parallaxing a static placeholder is motion for its own sake.
-  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 140]);
-  const parallaxTransform = useMotionTemplate`translate3d(0, ${parallaxY}px, 0) scale(1.14)`;
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 70]);
+  const parallaxTransform = useMotionTemplate`translate3d(0, ${parallaxY}px, 0) scale(1.08)`;
   const applyParallax = hasDarkMedia && !prefersReducedMotion;
 
   return (
@@ -50,9 +59,14 @@ export default function Hero() {
       aria-label={hero.headline}
     >
       {/* Media layer */}
+      {/* `transform` is always supplied, and set to "none" when parallax is off,
+          rather than dropping the style prop. Motion writes the transform to the
+          element directly; handing it `undefined` later leaves the last value in
+          place, so the layer stayed scaled 1.14 after a video failed to play —
+          shifting the poster and the placeholder label out of position. */}
       <motion.div
         className="absolute inset-0"
-        style={applyParallax ? { transform: parallaxTransform } : undefined}
+        style={{ transform: applyParallax ? parallaxTransform : "none" }}
       >
         <VideoAsset
           fill
@@ -61,6 +75,7 @@ export default function Hero() {
           webmSrc={assets.video.heroWebm}
           poster={assets.images.heroPoster}
           label="Hero video"
+          onPlaybackFailed={reportHeroPlaybackFailed}
         />
       </motion.div>
 

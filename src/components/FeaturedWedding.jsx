@@ -59,36 +59,38 @@ export default function FeaturedWedding() {
           </div>
         </div>
 
-        {/* Opening wide image */}
-        <Reveal className="mt-16 sm:mt-20">
-          <figure>
-            <Asset
-              src={assets.cases[0]}
-              ratio="3/2"
-              label="Case 01"
-              sizes="(max-width: 1440px) 100vw, 1440px"
-              className="w-full"
-            />
-            <figcaption className="mt-4 text-[0.75rem] uppercase tracking-wide2 text-cream/60">
-              {featured.captions[0]}
-            </figcaption>
-          </figure>
-        </Reveal>
+        {/* Opening image beside the copy.
+            The source photography is vertical (9:16), and a 9:16 frame run at
+            full container width would stand over 2000px tall — taller than any
+            viewport, so the reader would never see it whole. Tall images are
+            therefore held to a single column and the copy sits alongside,
+            which is also a better use of the space than a full-bleed crop. */}
+        <div className="mt-16 grid grid-cols-1 gap-10 sm:mt-20 lg:grid-cols-12 lg:gap-12">
+          <Reveal className="lg:col-span-4">
+            <figure>
+              <Asset
+                src={assets.cases[0]}
+                label="Case 01"
+                sizes="(max-width: 1024px) 100vw, 33vw"
+                className="w-full"
+              />
+              <figcaption className="mt-4 text-[0.75rem] uppercase tracking-wide2 text-cream/60">
+                {featured.captions[0]}
+              </figcaption>
+            </figure>
+          </Reveal>
 
-        {/* Copy set between the images so the section reads as a spread rather
-            than a photo dump with a heading. */}
-        <div className="mt-16 grid grid-cols-1 gap-10 sm:mt-20 lg:grid-cols-12">
-          <div className="space-y-5 lg:col-span-5">
-            {featured.body.map((paragraph, index) => (
-              <Reveal key={paragraph.slice(0, 32)} delay={index * 0.06}>
-                <p className="text-[1.0625rem] leading-[1.8] text-cream/80">{paragraph}</p>
-              </Reveal>
-            ))}
-          </div>
+          <div className="lg:col-span-7 lg:col-start-6 lg:pt-4">
+            <div className="space-y-5">
+              {featured.body.map((paragraph, index) => (
+                <Reveal key={paragraph.slice(0, 32)} delay={index * 0.06}>
+                  <p className="text-[1.0625rem] leading-[1.8] text-cream/80">{paragraph}</p>
+                </Reveal>
+              ))}
+            </div>
 
-          <div className="lg:col-span-6 lg:col-start-7">
-            <Reveal delay={0.1}>
-              <blockquote className="border-s-2 border-gold-soft ps-7">
+            <Reveal delay={0.16}>
+              <blockquote className="mt-12 border-s-2 border-gold-soft ps-7">
                 <p className="font-display text-[clamp(1.5rem,3vw,2.125rem)] italic leading-[1.35] text-cream">
                   {featured.pullQuote}
                 </p>
@@ -97,16 +99,17 @@ export default function FeaturedWedding() {
           </div>
         </div>
 
-        {/* Tall pair */}
-        <div className="mt-16 grid grid-cols-1 gap-6 sm:mt-20 sm:grid-cols-2 sm:gap-8">
-          {[1, 2].map((caseIndex) => (
-            <Reveal key={assets.cases[caseIndex]} delay={(caseIndex - 1) * 0.08}>
+        {/* The remaining three, as an even strip. Each column lands near 410px
+            on a wide screen, which keeps a 9:16 frame around 730px tall —
+            readable at a glance instead of scrolling past. */}
+        <div className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+          {[1, 2, 3].map((caseIndex) => (
+            <Reveal key={assets.cases[caseIndex]} delay={(caseIndex - 1) * 0.07}>
               <figure>
                 <Asset
                   src={assets.cases[caseIndex]}
-                  ratio="4/5"
                   label={`Case 0${caseIndex + 1}`}
-                  sizes="(max-width: 640px) 100vw, 50vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="w-full"
                 />
                 <figcaption className="mt-4 text-[0.75rem] uppercase tracking-wide2 text-cream/60">
@@ -116,22 +119,6 @@ export default function FeaturedWedding() {
             </Reveal>
           ))}
         </div>
-
-        {/* Closing wide image */}
-        <Reveal className="mt-8 sm:mt-10">
-          <figure>
-            <Asset
-              src={assets.cases[3]}
-              ratio="16/9"
-              label="Case 04"
-              sizes="(max-width: 1440px) 100vw, 1440px"
-              className="w-full"
-            />
-            <figcaption className="mt-4 text-[0.75rem] uppercase tracking-wide2 text-cream/60">
-              {featured.captions[3]}
-            </figcaption>
-          </figure>
-        </Reveal>
       </div>
     </section>
   );
