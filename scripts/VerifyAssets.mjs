@@ -117,12 +117,27 @@ function check(condition, message) {
 }
 
 /**
- * Generate a real JPEG at exact dimensions using the browser's own canvas
+ * Generate a real image at exact dimensions using the browser's own canvas
  * encoder. Avoids pulling in an image library just to make throwaway test files.
+ *
+ * The encoding follows the FILENAME, not a fixed format: the photo slots are
+ * WebP, and writing JPEG bytes into a .webp name would produce a file the
+ * browser refuses to decode — the swap test would then be measuring
+ * placeholders and quietly proving nothing.
  */
-async function makeDummyJpeg(page, width, height, seed) {
+const MIME_BY_EXTENSION = {
+  webp: "image/webp",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+};
+
+async function makeDummyImage(page, width, height, seed, filename) {
+  const extension = filename.split(".").pop()?.toLowerCase();
+  const mime = MIME_BY_EXTENSION[extension] || "image/jpeg";
+
   const dataUrl = await page.evaluate(
-    ({ w, h, s }) => {
+    ({ w, h, s, type }) => {
       const canvas = document.createElement("canvas");
       canvas.width = w;
       canvas.height = h;
@@ -134,9 +149,13 @@ async function makeDummyJpeg(page, width, height, seed) {
       ctx.font = `${Math.round(Math.min(w, h) * 0.09)}px sans-serif`;
       ctx.textAlign = "center";
       ctx.fillText(`${w}x${h}`, w / 2, h / 2);
-      return canvas.toDataURL("image/jpeg", 0.7);
+      const url = canvas.toDataURL(type, 0.7);
+      if (!url.startsWith(`data:${type}`)) {
+        throw new Error(`This browser cannot encode ${type}`);
+      }
+      return url;
     },
-    { w: width, h: height, s: seed }
+    { w: width, h: height, s: seed, type: mime }
   );
 
   return Buffer.from(dataUrl.split(",")[1], "base64");
@@ -367,8 +386,9 @@ async function run() {
     for (const [src, spec] of Object.entries(assetSpecs)) {
       if (spec.kind !== "image" || !spec.w || !spec.h) continue;
       seed += 1;
-      const buffer = await makeDummyJpeg(page, spec.w, spec.h, seed);
-      const target = join(servedImagesDir, getAssetFilename(src));
+      const filename = getAssetFilename(src);
+      const buffer = await makeDummyImage(page, spec.w, spec.h, seed, filename);
+      const target = join(servedImagesDir, filename);
       if (existsSync(target)) backups.set(target, readFileSync(target));
       writeFileSync(target, buffer);
       written.push(target);
