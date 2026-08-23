@@ -132,6 +132,28 @@ export default function VideoAsset({
   const showVideo = videoAvailable;
   const autoPlayVideo = showVideo && !prefersReducedMotion;
 
+  // iOS SAFARI AUTOPLAY FIX. React sets `muted` as a DOM property only and
+  // never renders the attribute into the markup — but iOS decides whether a
+  // video may autoplay by looking for the ATTRIBUTE on the element. Without
+  // it, iPhones sit on a black frame forever. So the attribute is stamped on
+  // imperatively, and play() is retried once for the devices that already
+  // refused before the attribute existed.
+  useEffect(() => {
+    const video = resolvedVideoRef.current;
+    if (!video || !showVideo) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute("muted", "");
+
+    if (autoPlayVideo && video.paused) {
+      video.play().catch(() => {
+        // Still refused (Low Power Mode, data saver): the play control is the
+        // designed path in, not an error.
+      });
+    }
+  }, [showVideo, autoPlayVideo, resolvedVideoRef, sources]);
+
   const specSource = (isPhone && mobileSrc) || desktopSrc;
   const spec = getAssetSpec(specSource);
   const requirement = getAssetRequirementLabel(specSource);

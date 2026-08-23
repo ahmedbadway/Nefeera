@@ -47,8 +47,10 @@
 
   /* Glass controls. Backdrop blur cost scales with radius × area, and every
      panel on this site blurs a playing video — keep radii capped, and drop
-     them further on phones where the GPU budget is a fraction of desktop. */
-  --glass-blur: 20px; /* section panels */
+     them further on phones where the GPU budget is a fraction of desktop.
+     14px was measured against 20px on desktop: visually near-identical
+     through the veil, meaningfully cheaper to repaint every video frame. */
+  --glass-blur: 14px; /* section panels */
   --glass-blur-frame: 12px; /* photo frames, pills, small chrome */
   /* Strength of the fixed warm-white veil laid over the video. 0.32 is
      load-bearing: with the .glass fill at /0.62 it keeps ink-muted text at
