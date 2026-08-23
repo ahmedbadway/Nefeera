@@ -1,18 +1,30 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+} from "motion/react";
 import { content } from "../data/Content.js";
 import { WhatsAppIcon } from "./Icons.jsx";
 
 /**
  * Floating WhatsApp button.
  *
+ * A solid sage core inside a thin glass ring — the ring ties it to the site's
+ * glass chrome while the core stays opaque, because a translucent WhatsApp
+ * button reads as a ghost of itself over moving footage.
+ *
  * Hidden while the hero is on screen — the hero already carries the same call to
  * action, and stacking a floating copy on top of it is just clutter. It appears
  * once you have scrolled past roughly one viewport, which is the point at which
- * the hero's button is gone and someone might actually want it back.
+ * the hero's button is gone and someone might actually want it back. Scroll
+ * position comes from Motion's useScroll — the raw listener stays banned.
  *
  * Positioned with logical properties (`end-5`) rather than `right-5`, so an RTL
- * pass moves it to the correct corner with no change here.
+ * pass moves it to the correct corner with no change here. It mirrors the film's
+ * pause control, which holds the bottom-start corner.
  *
  * The link and its prefilled message come from Content.js — the same values the
  * hero, the header, and the contact section use. There is no second copy of the
@@ -23,15 +35,13 @@ export default function WhatsAppFloat() {
   const prefersReducedMotion = useReducedMotion();
   const [visible, setVisible] = useState(false);
 
+  const { scrollY } = useScroll();
   useEffect(() => {
-    const onScroll = () => {
-      setVisible(window.scrollY > window.innerHeight * 0.9);
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    setVisible(scrollY.get() > window.innerHeight * 0.9);
+  }, [scrollY]);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setVisible(latest > window.innerHeight * 0.9);
+  });
 
   return (
     <AnimatePresence>
@@ -40,17 +50,17 @@ export default function WhatsAppFloat() {
           href={contact.whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="pressable float-elevation fixed bottom-5 end-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-gold text-warm-white hover:bg-charcoal sm:bottom-7 sm:end-7"
+          className="glass-pill pressable float-elevation fixed bottom-5 end-5 z-40 block rounded-full p-1 sm:bottom-7 sm:end-7"
           initial={
             prefersReducedMotion
               ? { opacity: 0 }
-              : { opacity: 0, transform: "translateY(14px) scale(0.92)" }
+              : { opacity: 0, transform: "translateY(14px) scale(0.95)" }
           }
           animate={{ opacity: 1, transform: "translateY(0px) scale(1)" }}
           exit={
             prefersReducedMotion
               ? { opacity: 0 }
-              : { opacity: 0, transform: "translateY(14px) scale(0.92)" }
+              : { opacity: 0, transform: "translateY(14px) scale(0.95)" }
           }
           transition={{
             // Exit is faster than entry: arriving should feel considered,
@@ -60,7 +70,12 @@ export default function WhatsAppFloat() {
           }}
         >
           <span className="sr-only-focusable">{contact.whatsappFloatLabel}</span>
-          <WhatsAppIcon className="h-7 w-7" />
+          <span
+            aria-hidden="true"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-sage-deep text-warm-white transition-colors duration-200 hover:bg-ink"
+          >
+            <WhatsAppIcon className="h-6 w-6" />
+          </span>
         </motion.a>
       ) : null}
     </AnimatePresence>

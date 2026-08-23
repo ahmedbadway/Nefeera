@@ -3,9 +3,9 @@
  *
  * WHY EACH COLOR IS DEFINED TWICE:
  * The first block stores the BARE OKLCH COMPONENTS (no `oklch(...)` wrapper).
- * tailwind.config.js wraps them as `oklch(var(--cream) / <alpha-value>)`, which
- * is what lets opacity utilities like `bg-charcoal/50` and `text-cream/80`
- * actually composite. A pre-wrapped `var(--color-cream)` cannot do that — the
+ * tailwind.config.js wraps them as `oklch(var(--sage) / <alpha-value>)`, which
+ * is what lets opacity utilities like `bg-ink/50` and `text-warm-white/80`
+ * actually composite. A pre-wrapped `var(--color-sage)` cannot do that — the
  * alpha has nowhere to go, and every `/opacity` utility on the site would
  * silently render at full strength.
  *
@@ -22,26 +22,38 @@
 
 :root {
   /* Bare OKLCH components — consumed by Tailwind with an alpha channel. */
-  --cream: 92.77% 0.0154 77.07; /* #EDE6DC */
-  --warm-white: 97.73% 0.0062 75.41; /* #FAF7F3 */
-  --gold: 66.28% 0.0908 80.47; /* #B08D4F */
-  --charcoal: 28.91% 0 89.88; /* #2B2B2B */
+  --warm-white: 98.15% 0.0067 97.35; /* #FAF9F4 — base, glass fills, text on dark glass */
+  --sage-mist: 93.85% 0.0160 130.42; /* #E7EDE2 — placeholder fields, tint washes */
+  --sage: 85.45% 0.0306 134.42; /* #C7D4C0 — light sage accents, decorative only */
+  --sage-deep: 46.70% 0.0295 152.23; /* #4E5F52 — accent-colored TEXT (6.5:1 on warm-white) */
+  --ink: 29.04% 0.0165 156.05; /* #252E28 — primary text, dark glass, primary button */
+  --ink-muted: 49.68% 0.0215 150.21; /* #5A665C — secondary text (5.7:1 on warm-white) */
 
-  /* Scoped to FeaturedWedding only — never nav, buttons, links, or footer. */
-  --burgundy: 32.95% 0.0968 8.66; /* #5C1A2B */
-
-  /* Supporting tints */
-  --gold-soft: 74.94% 0.0885 83.12; /* #C9A96B */
-  --charcoal-muted: 51.07% 0.0109 62.43; /* #6B6560 */
+  /* Champagne is decoration-only on light surfaces (hairlines, rules) — as
+     TEXT on light it fails contrast. champagne-deep is the text-grade version
+     (5.1:1 on warm-white); plain champagne may be text on dark glass (8.3:1). */
+  --champagne: 83.19% 0.0597 86.49; /* #D9C69C */
+  --champagne-deep: 52.46% 0.0623 86.59; /* #7A683F */
 
   /* Resolved colors, for plain CSS and inline styles. */
-  --color-cream: oklch(var(--cream));
   --color-warm-white: oklch(var(--warm-white));
-  --color-gold: oklch(var(--gold));
-  --color-charcoal: oklch(var(--charcoal));
-  --color-burgundy: oklch(var(--burgundy));
-  --color-gold-soft: oklch(var(--gold-soft));
-  --color-charcoal-muted: oklch(var(--charcoal-muted));
+  --color-sage-mist: oklch(var(--sage-mist));
+  --color-sage: oklch(var(--sage));
+  --color-sage-deep: oklch(var(--sage-deep));
+  --color-ink: oklch(var(--ink));
+  --color-ink-muted: oklch(var(--ink-muted));
+  --color-champagne: oklch(var(--champagne));
+  --color-champagne-deep: oklch(var(--champagne-deep));
+
+  /* Glass controls. Backdrop blur cost scales with radius × area, and every
+     panel on this site blurs a playing video — keep radii capped, and drop
+     them further on phones where the GPU budget is a fraction of desktop. */
+  --glass-blur: 20px; /* section panels */
+  --glass-blur-frame: 12px; /* photo frames, pills, small chrome */
+  /* Strength of the fixed warm-white veil laid over the video. 0.32 is
+     load-bearing: with the .glass fill at /0.62 it keeps ink-muted text at
+     ≥4.6:1 over pure-black footage. Do not lower either number. */
+  --backdrop-veil: 0.32;
 
   /* Motion curves — from the Emil Kowalski motion system.
      The built-in CSS easings are too weak to read as intentional. */
@@ -53,4 +65,11 @@
   --gutter: clamp(1.25rem, 5vw, 5.5rem);
 
   color-scheme: light;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --glass-blur: 10px;
+    --glass-blur-frame: 8px;
+  }
 }

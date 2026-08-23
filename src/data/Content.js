@@ -206,24 +206,24 @@ export const content = {
       heroPoster: "/assets/images/hero-poster.jpg",
       logoSvg: "/assets/images/logo.svg",
       logoPng: "/assets/images/logo.png",
-      aboutYomna: "/assets/images/about-yomna.jpg",
+      aboutYomna: "/assets/images/about-yomna.webp",
     },
     cases: [
-      "/assets/images/case-01.jpg",
-      "/assets/images/case-02.jpg",
-      "/assets/images/case-03.jpg",
-      "/assets/images/case-04.jpg",
+      "/assets/images/case-01.webp",
+      "/assets/images/case-02.webp",
+      "/assets/images/case-03.webp",
+      "/assets/images/case-04.webp",
     ],
     // Seven gallery slots. To add an eighth, add the path here AND a matching
     // entry in `assetSpecs` below, then run `npm run assets`.
     gallery: [
-      "/assets/images/gallery-01.jpg",
-      "/assets/images/gallery-02.jpg",
-      "/assets/images/gallery-03.jpg",
-      "/assets/images/gallery-04.jpg",
-      "/assets/images/gallery-05.jpg",
-      "/assets/images/gallery-06.jpg",
-      "/assets/images/gallery-07.jpg",
+      "/assets/images/gallery-01.webp",
+      "/assets/images/gallery-02.webp",
+      "/assets/images/gallery-03.webp",
+      "/assets/images/gallery-04.webp",
+      "/assets/images/gallery-05.webp",
+      "/assets/images/gallery-06.webp",
+      "/assets/images/gallery-07.webp",
     ],
   },
 };
@@ -305,7 +305,7 @@ export const assetSpecs = {
   },
 
   // ---- About ---------------------------------------------------------------
-  "/assets/images/about-yomna.jpg": {
+  "/assets/images/about-yomna.webp": {
     kind: "image",
     w: 1200,
     h: 1200,
@@ -317,7 +317,7 @@ export const assetSpecs = {
   },
 
   // ---- Featured wedding ----------------------------------------------------
-  "/assets/images/case-01.jpg": {
+  "/assets/images/case-01.webp": {
     kind: "image",
     w: 1080,
     h: 1920,
@@ -327,7 +327,7 @@ export const assetSpecs = {
       "Featured wedding — the opening image, beside the introduction copy",
     alt: "Ceremony and reception design for a Nefeera wedding",
   },
-  "/assets/images/case-02.jpg": {
+  "/assets/images/case-02.webp": {
     kind: "image",
     w: 1080,
     h: 1920,
@@ -337,7 +337,7 @@ export const assetSpecs = {
       "Featured wedding — first image in the row of three",
     alt: "Table and place setting detail",
   },
-  "/assets/images/case-03.jpg": {
+  "/assets/images/case-03.webp": {
     kind: "image",
     w: 1080,
     h: 1920,
@@ -347,7 +347,7 @@ export const assetSpecs = {
       "Featured wedding — second image in the row of three",
     alt: "Floral installation detail",
   },
-  "/assets/images/case-04.jpg": {
+  "/assets/images/case-04.webp": {
     kind: "image",
     w: 1080,
     h: 1920,
@@ -362,7 +362,7 @@ export const assetSpecs = {
   // Ratios are deliberately mixed so the grid reads as an editorial mosaic
   // rather than a row of identical cards. Each slot's ratio is fixed here, so
   // the mixed grid is exactly as strict a contract as a uniform one would be.
-  "/assets/images/gallery-01.jpg": {
+  "/assets/images/gallery-01.webp": {
     kind: "image",
     w: 1200,
     h: 1600,
@@ -372,7 +372,7 @@ export const assetSpecs = {
       "Gallery — column 1, first image",
     alt: "Wedding detail — gallery image 1",
   },
-  "/assets/images/gallery-02.jpg": {
+  "/assets/images/gallery-02.webp": {
     kind: "image",
     w: 1200,
     h: 1600,
@@ -382,7 +382,7 @@ export const assetSpecs = {
       "Gallery — column 1, second image",
     alt: "Wedding detail — gallery image 2",
   },
-  "/assets/images/gallery-03.jpg": {
+  "/assets/images/gallery-03.webp": {
     kind: "image",
     w: 1080,
     h: 1920,
@@ -392,7 +392,7 @@ export const assetSpecs = {
       "Gallery — column 1, third image (tall)",
     alt: "Wedding detail — gallery image 3",
   },
-  "/assets/images/gallery-04.jpg": {
+  "/assets/images/gallery-04.webp": {
     kind: "image",
     w: 1080,
     h: 1920,
@@ -402,7 +402,7 @@ export const assetSpecs = {
       "Gallery — column 2, first image (tall)",
     alt: "Wedding detail — gallery image 4",
   },
-  "/assets/images/gallery-05.jpg": {
+  "/assets/images/gallery-05.webp": {
     kind: "image",
     w: 1080,
     h: 1920,
@@ -412,7 +412,7 @@ export const assetSpecs = {
       "Gallery — column 2, second image (tall)",
     alt: "Wedding detail — gallery image 5",
   },
-  "/assets/images/gallery-06.jpg": {
+  "/assets/images/gallery-06.webp": {
     kind: "image",
     w: 1200,
     h: 1600,
@@ -422,7 +422,7 @@ export const assetSpecs = {
       "Gallery — column 2, third image",
     alt: "Wedding detail — gallery image 6",
   },
-  "/assets/images/gallery-07.jpg": {
+  "/assets/images/gallery-07.webp": {
     kind: "image",
     w: 1080,
     h: 1920,
@@ -452,7 +452,7 @@ export function getAssetSpec(src) {
   );
 }
 
-/** "gallery-01.jpg" from "/assets/images/gallery-01.jpg". */
+/** "gallery-01.webp" from "/assets/images/gallery-01.webp". */
 export function getAssetFilename(src) {
   if (!src) return "";
   return src.split("/").pop();
@@ -460,7 +460,7 @@ export function getAssetFilename(src) {
 
 /**
  * The requirement line printed inside a placeholder, e.g.
- * "gallery-01.jpg — 1200×1500". Falls back to just the filename for vector
+ * "gallery-01.webp — 1200×1600". Falls back to just the filename for vector
  * assets that have no fixed pixel size.
  */
 export function getAssetRequirementLabel(src) {

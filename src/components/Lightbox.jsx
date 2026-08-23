@@ -122,7 +122,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
           role="dialog"
           aria-modal="true"
           aria-label={copy.regionLabel}
-          className="fixed inset-0 z-[70] flex flex-col bg-charcoal/95 backdrop-blur-sm"
+          className="fixed inset-0 z-[70] flex flex-col bg-ink/92 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -130,7 +130,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
         >
           {/* Header: counter and close */}
           <div className="flex shrink-0 items-center justify-between px-5 py-4 sm:px-8">
-            <p className="text-[0.75rem] uppercase tracking-wide2 text-cream/70">
+            <p className="text-[0.75rem] uppercase tracking-wide2 text-warm-white/70">
               <span aria-hidden="true">
                 {String(index + 1).padStart(2, "0")} {copy.counterSeparator}{" "}
                 {String(images.length).padStart(2, "0")}
@@ -144,7 +144,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
               ref={closeButtonRef}
               type="button"
               onClick={onClose}
-              className="pressable inline-flex h-11 w-11 items-center justify-center text-cream hover:text-gold-soft"
+              className="glass-pill-dark pressable inline-flex h-11 w-11 items-center justify-center rounded-full text-warm-white hover:text-champagne"
             >
               <span className="sr-only-focusable">{copy.close}</span>
               <CloseIcon className="h-6 w-6" />
@@ -187,7 +187,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
             <button
               type="button"
               onClick={goPrevious}
-              className="pressable inline-flex h-12 w-12 items-center justify-center border border-cream/25 text-cream hover:border-gold-soft hover:text-gold-soft"
+              className="glass-pill-dark pressable inline-flex h-12 w-12 items-center justify-center rounded-full text-warm-white hover:text-champagne"
             >
               <span className="sr-only-focusable">{copy.previous}</span>
               <ChevronIcon className="h-5 w-5" direction="start" />
@@ -196,7 +196,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
             <button
               type="button"
               onClick={goNext}
-              className="pressable inline-flex h-12 w-12 items-center justify-center border border-cream/25 text-cream hover:border-gold-soft hover:text-gold-soft"
+              className="glass-pill-dark pressable inline-flex h-12 w-12 items-center justify-center rounded-full text-warm-white hover:text-champagne"
             >
               <span className="sr-only-focusable">{copy.next}</span>
               <ChevronIcon className="h-5 w-5" direction="end" />

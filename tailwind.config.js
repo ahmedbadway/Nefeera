@@ -15,22 +15,24 @@ export default {
         // never drift apart.
         //
         // The `<alpha-value>` placeholder is what makes opacity utilities work:
-        // `bg-charcoal/50` compiles to `oklch(var(--charcoal) / 0.5)`. Wrapping
-        // a pre-built `var(--color-charcoal)` instead would leave the alpha with
+        // `bg-ink/50` compiles to `oklch(var(--ink) / 0.5)`. Wrapping a
+        // pre-built `var(--color-ink)` instead would leave the alpha with
         // nowhere to go and every `/opacity` class on the site would render at
         // full strength.
-        cream: "oklch(var(--cream) / <alpha-value>)",
         "warm-white": "oklch(var(--warm-white) / <alpha-value>)",
-        gold: "oklch(var(--gold) / <alpha-value>)",
-        "gold-soft": "oklch(var(--gold-soft) / <alpha-value>)",
-        charcoal: "oklch(var(--charcoal) / <alpha-value>)",
-        "charcoal-muted": "oklch(var(--charcoal-muted) / <alpha-value>)",
-        // Scoped to the FeaturedWedding section only.
-        burgundy: "oklch(var(--burgundy) / <alpha-value>)",
+        "sage-mist": "oklch(var(--sage-mist) / <alpha-value>)",
+        sage: "oklch(var(--sage) / <alpha-value>)",
+        "sage-deep": "oklch(var(--sage-deep) / <alpha-value>)",
+        ink: "oklch(var(--ink) / <alpha-value>)",
+        "ink-muted": "oklch(var(--ink-muted) / <alpha-value>)",
+        champagne: "oklch(var(--champagne) / <alpha-value>)",
+        "champagne-deep": "oklch(var(--champagne-deep) / <alpha-value>)",
       },
       fontFamily: {
-        display: ["'Cormorant Garamond'", "Georgia", "'Times New Roman'", "serif"],
-        body: ["Inter", "system-ui", "-apple-system", "'Segoe UI'", "sans-serif"],
+        // Italiana ships in weight 400 only — never pair font-display with a
+        // weight utility, the browser would synthesize a fake bold.
+        display: ["Italiana", "Didot", "Georgia", "serif"],
+        body: ["Outfit", "system-ui", "-apple-system", "'Segoe UI'", "sans-serif"],
       },
       letterSpacing: {
         wide2: "0.22em",

@@ -1,23 +1,33 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+} from "motion/react";
 import { content } from "../data/Content.js";
-import { useHeroMedia } from "../utils/UseHeroMedia.js";
+import Button from "./Button.jsx";
 import Logo from "./Logo.jsx";
 import { MenuIcon, CloseIcon, WhatsAppIcon } from "./Icons.jsx";
 
 /**
- * Fixed header.
+ * Floating glass pill header.
  *
- * Sits transparent over the hero video with the light logo, then picks up a
- * glass background and a gold hairline once you scroll past the hero. The
- * transition is opacity/background only — the header never moves, so it cannot
- * cause layout shift or jitter while scrolling.
+ * Detached from every edge, so the film stays visible around it — the header
+ * reads as an object floating over the footage rather than a bar capping the
+ * page. It carries its own glass at all times, which is what freed it from the
+ * old dark-media color switching: the pill supplies its own contrast whatever
+ * plays behind it. Scrolling only strengthens the fill a touch.
  *
  * THERE IS NO LINK BAR, AT ANY WIDTH.
  * Navigation lives entirely behind the menu button, so the header carries just
  * the lockup and one control and stays out of the way of the film behind it.
  * The panel it opens is the same one on a phone and on a desktop; only the
  * type scale changes.
+ *
+ * Scroll position is read through Motion's useScroll rather than a scroll
+ * listener — the raw listener is the one scroll API this codebase bans.
  *
  * Spacing uses logical properties throughout (ps/pe, ms/me, start/end) so the
  * planned Arabic RTL pass is a direction flip with no layout rewrite.
@@ -31,12 +41,13 @@ export default function Nav() {
   const menuButtonRef = useRef(null);
   const closeButtonRef = useRef(null);
 
+  const { scrollY } = useScroll();
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    setScrolled(scrollY.get() > 40);
+  }, [scrollY]);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 40);
+  });
 
   // Lock the page behind the open menu, and restore the scrollbar gutter
   // so the header does not jump sideways as the scrollbar disappears.
@@ -72,39 +83,29 @@ export default function Nav() {
     }
   }, [menuOpen]);
 
-  const solid = scrolled || menuOpen;
-
-  // At the top of the page the header sits on the hero. Cream type only works
-  // there if there is real media behind it — with nothing uploaded the hero is a
-  // light cream panel, so the header has to stay charcoal or it disappears.
-  // See utils/UseHeroMedia.js.
-  const { hasDarkMedia } = useHeroMedia();
-  const lightType = !solid && hasDarkMedia;
-  const logoColor = lightType ? "light" : "dark";
-
   return (
     <>
       <a
         href="#main"
-        className="sr-only-focusable fixed start-4 top-4 z-[60] rounded-sm bg-charcoal px-4 py-2 text-sm text-warm-white"
+        className="sr-only-focusable fixed start-4 top-4 z-[60] rounded-sm bg-ink px-4 py-2 text-sm text-warm-white"
       >
         {nav.skipToContent}
       </a>
 
-      <header
-        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,box-shadow] duration-500 ease-out-strong ${
-          solid
-            ? "glass border-x-0 border-t-0"
-            : "border-b border-transparent bg-transparent"
-        }`}
-      >
-        <div className="shell flex items-center justify-between gap-6 py-4">
+      {/* The outer strip is pointer-transparent so the film stays clickable-
+          through around the pill; only the pill itself takes the pointer. */}
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
+        <div
+          className={`glass-pill pointer-events-auto mx-auto mt-3 flex w-[min(100%-2rem,64rem)] items-center justify-between gap-4 rounded-full py-2 pe-2 ps-5 transition-colors duration-500 ease-out-strong sm:mt-4 ${
+            scrolled || menuOpen ? "bg-warm-white/80" : ""
+          }`}
+        >
           <a
             href="#hero"
             className="pressable inline-flex shrink-0"
             aria-label={`${content.brand.name} — home`}
           >
-            <Logo variant="wordmark" size="xs" color={logoColor} />
+            <Logo variant="inline" size="xs" color="dark" />
           </a>
 
           <button
@@ -113,9 +114,7 @@ export default function Nav() {
             onClick={() => setMenuOpen(true)}
             aria-expanded={menuOpen}
             aria-controls="site-menu"
-            className={`pressable -me-2 inline-flex h-11 w-11 items-center justify-center ${
-              lightType ? "text-warm-white" : "text-charcoal"
-            }`}
+            className="pressable inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink/5 text-ink transition-colors duration-200 hover:bg-ink/10"
           >
             <span className="sr-only-focusable">{nav.openMenu}</span>
             <MenuIcon className="h-6 w-6" />
@@ -130,20 +129,20 @@ export default function Nav() {
             role="dialog"
             aria-modal="true"
             aria-label={nav.menuLabel}
-            className="fixed inset-0 z-[55] bg-warm-white/85 backdrop-blur-2xl"
+            className="fixed inset-0 z-[55] bg-warm-white/65 backdrop-blur-[var(--glass-blur)]"
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(-8px)" }}
             transition={{ duration: prefersReducedMotion ? 0.15 : 0.28, ease: [0.23, 1, 0.32, 1] }}
           >
             <div className="shell flex h-full flex-col">
-              <div className="flex items-center justify-between py-4">
-                <Logo variant="wordmark" size="xs" color="dark" />
+              <div className="flex items-center justify-between py-5">
+                <Logo variant="inline" size="xs" color="dark" />
                 <button
                   ref={closeButtonRef}
                   type="button"
                   onClick={() => setMenuOpen(false)}
-                  className="pressable -me-2 inline-flex h-11 w-11 items-center justify-center text-charcoal"
+                  className="pressable inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink/5 text-ink transition-colors duration-200 hover:bg-ink/10"
                 >
                   <span className="sr-only-focusable">{nav.closeMenu}</span>
                   <CloseIcon className="h-6 w-6" />
@@ -159,30 +158,32 @@ export default function Nav() {
                     key={item.id}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className="border-b border-gold/20 py-4 font-display text-[clamp(1.5rem,3vw,2.25rem)] text-charcoal transition-colors duration-200 hover:text-gold"
+                    className="border-b border-champagne/40 py-4 font-display text-[clamp(2rem,5vw,3.25rem)] text-ink transition-colors duration-200 hover:text-sage-deep"
                     style={{
                       // Short stagger so the list cascades in rather than
                       // appearing all at once. Decorative only — the links are
                       // clickable from the first frame.
                       animation: prefersReducedMotion
                         ? undefined
-                        : `nefeera-menu-in 380ms cubic-bezier(0.23,1,0.32,1) ${index * 45}ms both`,
+                        : `nefeera-menu-in 320ms cubic-bezier(0.23,1,0.32,1) ${index * 40}ms both`,
                     }}
                   >
                     {item.label}
                   </a>
                 ))}
 
-                <a
+                <Button
                   href={contact.whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMenuOpen(false)}
-                  className="pressable mt-9 inline-flex items-center justify-center gap-2.5 bg-gold px-6 py-4 text-[0.6875rem] font-medium uppercase tracking-wide2 text-warm-white"
+                  variant="primary"
+                  tone="light"
+                  icon={<WhatsAppIcon className="h-4 w-4" />}
+                  className="mt-9 justify-center"
                 >
-                  <WhatsAppIcon className="h-4 w-4" />
                   {nav.cta}
-                </a>
+                </Button>
               </nav>
             </div>
           </motion.div>

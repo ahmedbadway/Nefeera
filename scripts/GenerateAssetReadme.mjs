@@ -96,9 +96,9 @@ order. A half-filled site still looks finished.
 
 ### The three rules
 
-1. **The file name must match exactly.** \`gallery-01.jpg\` works.
-   \`Gallery-01.jpg\`, \`gallery-1.jpg\`, \`gallery-01.JPG\`, and
-   \`gallery-01 (1).jpg\` do not. Lower case, exact spelling, exact extension.
+1. **The file name must match exactly.** \`gallery-01.webp\` works.
+   \`Gallery-01.webp\`, \`gallery-1.webp\`, \`gallery-01.WEBP\`, and
+   \`gallery-01 (1).webp\` do not. Lower case, exact spelling, exact extension.
 2. **The size must match.** The sizes in the table below are not suggestions.
    A different size will still display, but it will be cropped to fit the slot,
    and you may lose part of the picture.
@@ -264,21 +264,25 @@ important away from the outer edges.
 
 ---
 
-## If you would rather use WebP
+## The photos are WebP
 
-WebP files are typically 25–35% smaller than JPEG at the same quality. The site
-supports them, but it needs one small change to switch over — every file name is
-listed in a single file, \`src/data/Content.js\`, and the \`.jpg\` endings would
-need changing to \`.webp\`. Ask Ahmed; it is a two-minute job.
+Every photo slot expects a \`.webp\` file. WebP is typically 25–35% smaller than
+JPEG at the same quality, which matters because most guests will open this site
+on mobile data.
 
-To convert:
+If your photo is a JPEG, convert it first. On a Mac or PC, any of the free
+online converters will do, or on the command line:
 
 \`\`\`bash
-cwebp -q 80 gallery-01.jpg -o gallery-01.webp
+cwebp -q 82 my-photo.jpg -o gallery-01.webp
 \`\`\`
 
-Do not rename \`.jpg\` files to \`.webp\` by hand — that produces a broken file.
-Convert them properly.
+Do not rename a \`.jpg\` file to \`.webp\` by hand — that produces a broken file
+that will not display. Convert it properly.
+
+The one exception is the video still frame, \`hero-poster.jpg\`, which stays a
+JPEG: it is also used as the preview image when the site is shared on WhatsApp
+and Facebook, and those expect a JPEG.
 
 ---
 
@@ -303,7 +307,8 @@ Work down this list:
 
 1. **Check the file name against the table, character by character.** This is
    the cause roughly nine times out of ten. Watch for capital letters, a missing
-   leading zero (\`gallery-1\` instead of \`gallery-01\`), and \`.JPG\` versus \`.jpg\`.
+   leading zero (\`gallery-1\` instead of \`gallery-01\`), and \`.WEBP\` versus
+   \`.webp\`.
 2. **Check it is in the right folder** — \`images/\` or \`video/\`, not loose in
    \`assets/\`.
 3. **Give it a minute and hard-refresh.** The site rebuilds after each upload.

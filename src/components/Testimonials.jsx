@@ -6,7 +6,7 @@ import SectionHeading from "./SectionHeading.jsx";
  * Testimonials.
  *
  * NOTHING HERE IS INVENTED. Nefeera has no published client quotes yet, so
- * these render as visible, obviously-unfinished placeholders — dashed gold
+ * these render as visible, obviously-unfinished placeholders — dashed champagne
  * border, no name, no photograph, no quote. Writing plausible-sounding reviews
  * and attaching invented names to them would be fabricating client
  * endorsements, which is not a thing to ship even as a stand-in.
@@ -14,8 +14,10 @@ import SectionHeading from "./SectionHeading.jsx";
  * Fill `testimonials.items` in Content.js with real, permissioned quotes and
  * each card switches to its finished form automatically.
  *
- * The cards are offset vertically rather than sitting in a level row — three
- * identical cards in a line is the stock template shape.
+ * THE ONE SECTION WITHOUT A WRAPPING PANEL: the heading gets a small glass
+ * plate of its own and the three cards float free over the film, offset
+ * vertically — three identical cards in a level row inside a box is the stock
+ * template shape this avoids.
  */
 export default function Testimonials() {
   const { testimonials } = content;
@@ -27,16 +29,18 @@ export default function Testimonials() {
     <section
       id="testimonials"
       aria-labelledby="testimonials-heading"
-      className="relative bg-cream py-24 sm:py-32 lg:py-40"
+      className="relative py-16 sm:py-20 lg:py-24"
     >
       <div className="shell">
-        <SectionHeading
-          id="testimonials-heading"
-          eyebrow={testimonials.eyebrow}
-          headline={testimonials.headline}
-        />
+        <div className="glass inline-block rounded-3xl p-6 sm:p-8 lg:p-10">
+          <SectionHeading
+            id="testimonials-heading"
+            eyebrow={testimonials.eyebrow}
+            headline={testimonials.headline}
+          />
+        </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-6 sm:mt-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:mt-16 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           {testimonials.items.map((item, index) => {
             const isPending = !item.quote;
 
@@ -47,37 +51,37 @@ export default function Testimonials() {
                 className={offsets[index % offsets.length]}
               >
                 {isPending ? (
-                  <div className="glass flex h-full min-h-[14rem] flex-col items-start justify-center border-dashed p-7">
+                  <div className="glass-soft flex h-full min-h-[14rem] flex-col items-start justify-center rounded-2xl border-dashed border-champagne/60 p-7">
                     <span
                       aria-hidden="true"
-                      className="font-display text-[2rem] leading-none text-gold/50"
+                      className="font-display text-[2rem] leading-none text-champagne-deep/50"
                     >
                       &ldquo;
                     </span>
-                    <p className="mt-4 text-[0.875rem] leading-relaxed text-charcoal-muted">
+                    <p className="mt-4 text-[0.875rem] leading-relaxed text-ink">
                       {testimonials.pendingLabel}
                     </p>
-                    <p className="mt-3 text-[0.6875rem] uppercase tracking-wide2 text-gold">
+                    <p className="mt-3 text-[0.6875rem] uppercase tracking-wide2 text-sage-deep">
                       {testimonials.pendingHint}
                     </p>
                   </div>
                 ) : (
-                  <figure className="glass flex h-full min-h-[14rem] flex-col justify-between p-7">
+                  <figure className="glass flex h-full min-h-[14rem] flex-col justify-between rounded-2xl p-7">
                     <div>
                       <span
                         aria-hidden="true"
-                        className="font-display text-[2rem] leading-none text-gold/60"
+                        className="font-display text-[2rem] leading-none text-champagne-deep/60"
                       >
                         &ldquo;
                       </span>
                       <blockquote className="mt-4">
-                        <p className="font-display text-[1.0625rem] leading-[1.6] text-charcoal">
+                        <p className="font-display text-[1.125rem] leading-[1.55] text-ink">
                           {item.quote}
                         </p>
                       </blockquote>
                     </div>
                     {item.attribution ? (
-                      <figcaption className="mt-7 text-[0.75rem] uppercase tracking-wide2 text-charcoal-muted">
+                      <figcaption className="mt-7 text-[0.75rem] uppercase tracking-wide2 text-ink-muted">
                         {item.attribution}
                       </figcaption>
                     ) : null}

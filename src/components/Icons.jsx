@@ -59,17 +59,6 @@ export function MenuIcon({ className = "" }) {
   );
 }
 
-export function ExpandIcon({ className = "" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...base}>
-      <path d="M4 9V4h5" />
-      <path d="M20 15v5h-5" />
-      <path d="M15 4h5v5" />
-      <path d="M9 20H4v-5" />
-    </svg>
-  );
-}
-
 export function InstagramIcon({ className = "" }) {
   return (
     <svg viewBox="0 0 24 24" className={className} {...base}>
