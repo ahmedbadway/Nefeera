@@ -1,22 +1,23 @@
 import { useState } from "react";
-import { content, getAssetSpec } from "../data/Content.js";
-import Asset from "./Asset.jsx";
-import Reveal from "./Reveal.jsx";
-import SectionHeading from "./SectionHeading.jsx";
+import { content } from "../data/Content.js";
+import GallerySlider from "./GallerySlider.jsx";
 import Lightbox from "./Lightbox.jsx";
-import { ExpandIcon } from "./Icons.jsx";
+import SectionHeading from "./SectionHeading.jsx";
 
 /**
- * Gallery — nine slots in a mixed-ratio mosaic.
+ * Gallery — seven slots on a full-bleed drag strip.
  *
- * CSS multi-column rather than a uniform grid. The nine slots are deliberately
- * three different shapes (4:5, 3:2, 1:1), which columns flow around naturally
- * while a grid would need every cell to match. A row of nine identical tiles is
- * the template look; an uneven mosaic reads as an edit.
+ * The old CSS-column mosaic is gone. The images now live on a horizontal
+ * strip you drag through (see GallerySlider.jsx), which does two things the
+ * mosaic could not: it puts the film in the gaps between cards, and it makes
+ * the gallery something you handle rather than scroll past.
  *
  * The mixed ratios are no looser a contract than uniform ones would be — each
  * slot's ratio is pinned in `assetSpecs`, printed in the upload README, and
  * enforced by the Asset box. Swapping any one file moves nothing.
+ *
+ * The heading sits on its own small glass plate: a full-width panel would
+ * fight the full-bleed strip below it.
  */
 export default function Gallery() {
   const { gallery, assets } = content;
@@ -26,61 +27,29 @@ export default function Gallery() {
     <section
       id="gallery"
       aria-labelledby="gallery-heading"
-      className="relative bg-warm-white py-24 sm:py-32 lg:py-40"
+      className="relative py-16 sm:py-20 lg:py-24"
     >
       <div className="shell">
-        <SectionHeading
-          id="gallery-heading"
-          eyebrow={gallery.eyebrow}
-          headline={gallery.headline}
-          body={gallery.body}
-        />
-
-        <div className="mt-16 gap-6 [column-count:1] sm:[column-count:2] lg:[column-count:3] lg:gap-8">
-          {assets.gallery.map((src, index) => {
-            const spec = getAssetSpec(src);
-            const label = `Gallery ${String(index + 1).padStart(2, "0")}`;
-
-            return (
-              <Reveal
-                key={src}
-                delay={(index % 3) * 0.06}
-                className="mb-6 break-inside-avoid lg:mb-8"
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenIndex(index)}
-                  className="glass-frame group relative block w-full"
-                >
-                  <span className="sr-only-focusable">
-                    {`${gallery.viewLabel} — ${spec.alt || label}`}
-                  </span>
-
-                  <Asset
-                    src={src}
-                    ratio={spec.ratio}
-                    label={label}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    imgClassName="transition-transform duration-[900ms] ease-out-strong group-hover:scale-[1.04]"
-                    className="w-full overflow-hidden"
-                  />
-
-                  {/* Hover affordance. Gated to real pointers by the
-                      hoverOnlyWhenSupported flag in tailwind.config.js, so a tap
-                      on a phone does not latch it on. */}
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-[clamp(0.375rem,1vw,0.625rem)] flex items-center justify-center bg-ink/0 opacity-0 transition-all duration-500 ease-out-strong group-hover:bg-ink/25 group-hover:opacity-100 group-focus-visible:bg-ink/25 group-focus-visible:opacity-100"
-                  >
-                    <span className="flex h-12 w-12 items-center justify-center border border-warm-white/70 text-warm-white">
-                      <ExpandIcon className="h-5 w-5" />
-                    </span>
-                  </span>
-                </button>
-              </Reveal>
-            );
-          })}
+        <div className="glass inline-block rounded-3xl p-6 sm:p-8 lg:p-10">
+          <SectionHeading
+            id="gallery-heading"
+            eyebrow={gallery.eyebrow}
+            headline={gallery.headline}
+            body={gallery.body}
+          />
         </div>
+      </div>
+
+      <div className="mt-12 sm:mt-16">
+        <GallerySlider
+          images={assets.gallery}
+          onOpen={setOpenIndex}
+          viewLabel={gallery.viewLabel}
+          pagingLabels={{
+            previous: gallery.lightbox.previous,
+            next: gallery.lightbox.next,
+          }}
+        />
       </div>
 
       <Lightbox

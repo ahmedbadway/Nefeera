@@ -122,7 +122,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
           role="dialog"
           aria-modal="true"
           aria-label={copy.regionLabel}
-          className="fixed inset-0 z-[70] flex flex-col bg-ink/95 backdrop-blur-sm"
+          className="fixed inset-0 z-[70] flex flex-col bg-ink/92 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

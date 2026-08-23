@@ -107,6 +107,11 @@ export default function Asset({
           loading={priority ? "eager" : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
           decoding="async"
+          // Native image dragging would otherwise hijack the pointer: press an
+          // image in the gallery strip and the browser starts its own drag-and-
+          // drop ghost, which swallows the pointermove events the slider needs.
+          // Nothing on this site is meant to be dragged out of the page.
+          draggable={false}
           onLoad={() => setStatus("loaded")}
           onError={() => setStatus("error")}
           className={`absolute inset-0 h-full w-full transition-opacity duration-500 ease-out-strong ${imgClassName}`}
