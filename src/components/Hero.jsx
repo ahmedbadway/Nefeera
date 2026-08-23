@@ -1,104 +1,56 @@
-import { useRef } from "react";
-import { motion, useMotionTemplate, useScroll, useTransform, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { content } from "../data/Content.js";
-import { useHeroMedia, reportHeroPlaybackFailed } from "../utils/UseHeroMedia.js";
-import VideoAsset from "./VideoAsset.jsx";
+import { useHeroMedia } from "../utils/UseHeroMedia.js";
 import { WhatsAppIcon, ArrowIcon } from "./Icons.jsx";
 
 /**
  * Full-height opening section.
  *
- * TWO DISTINCT LOOKS, NOT ONE LOOK WITH A HOLE IN IT:
- * With footage uploaded, this is a dark cinematic hero — video behind a layered
- * scrim, warm-white type on top. With no footage, the same section becomes a warm-white
- * editorial hero with ink type and a gold rule. The switch is driven by
- * useHeroMedia() and transitioned rather than snapped.
+ * THE HERO NO LONGER OWNS THE FILM. The video lives in FixedVideoBackdrop,
+ * behind the whole page; this section is transparent, so the opening viewport
+ * shows the footage raw with the type directly on it — the one place on the
+ * site where text sits on film instead of on glass. Depth comes free: the
+ * content scrolls while the film stays put, which reads like parallax without
+ * a scroll-linked transform.
  *
- * That is the whole point of the asset system: the missing state is designed,
- * not merely survivable.
+ * TWO DISTINCT LOOKS, NOT ONE LOOK WITH A HOLE IN IT:
+ * With footage uploaded, warm-white type over a directional ink scrim. With no
+ * media, the backdrop shows its sage-mist placeholder field, the scrim fades
+ * out, and the type flips to ink. The switch is driven by useHeroMedia() and
+ * transitioned rather than snapped.
  *
  * The layout is deliberately bottom-and-start aligned rather than centered —
  * a centered hero is the generic default this project exists to avoid.
  */
 export default function Hero() {
-  const { hero, assets, contact } = content;
+  const { hero, contact } = content;
   const prefersReducedMotion = useReducedMotion();
-  const sectionRef = useRef(null);
 
-  // hasDarkMedia, not hasVideo: under reduced motion the poster is what ends up
-  // behind this copy, so that is what decides whether warm-white type can be read.
-  // See utils/UseHeroMedia.js.
+  // hasDarkMedia, not hasVideo: a poster with no playable film still puts a
+  // dark picture behind this copy. See utils/UseHeroMedia.js.
   const { hasDarkMedia } = useHeroMedia();
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-
-  // Media drifts slower than the page. It has to be scaled up a little so the
-  // translate never exposes an edge — but that scale is a SECOND enlargement on
-  // top of however much the video is already being stretched to cover the
-  // viewport, and it costs real sharpness.
-  //
-  // So both numbers are the geometric minimum rather than round ones: drifting
-  // 70px over a ~900px-tall hero needs 1 + 70/900 ≈ 1.08, not the 1.14 that was
-  // here before. On a 1440px screen that takes a 464px-wide source from a 3.54x
-  // enlargement down to 3.35x. Small, but free.
-  //
-  // Disabled entirely for reduced motion and when there is no footage —
-  // parallaxing a static placeholder is motion for its own sake.
-  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 70]);
-  const parallaxTransform = useMotionTemplate`translate3d(0, ${parallaxY}px, 0) scale(1.08)`;
-  const applyParallax = hasDarkMedia && !prefersReducedMotion;
 
   return (
     <section
-      ref={sectionRef}
       id="hero"
-      className="relative isolate min-h-[100svh] overflow-hidden bg-sage-mist"
+      className="relative min-h-[100svh]"
       aria-label={hero.headline}
     >
-      {/* Media layer */}
-      {/* `transform` is always supplied, and set to "none" when parallax is off,
-          rather than dropping the style prop. Motion writes the transform to the
-          element directly; handing it `undefined` later leaves the last value in
-          place, so the layer stayed scaled 1.14 after a video failed to play —
-          shifting the poster and the placeholder label out of position. */}
-      <motion.div
-        className="absolute inset-0"
-        style={{ transform: applyParallax ? parallaxTransform : "none" }}
-      >
-        {/* One file at every width. A second portrait cut would double the
-            upload burden for the client and the bytes on the wire; the crop is
-            steered with object-position instead — biased to the upper-middle on
-            tall phone viewports so the subject is not cut off, centred from
-            768px up where the frame is close to the source ratio. */}
-        <VideoAsset
-          fill
-          objectPositionClass="object-[35%_15%] md:object-center"
-          desktopSrc={assets.video.heroDesktop}
-          webmSrc={assets.video.heroWebm}
-          poster={assets.images.heroPoster}
-          label="Hero video"
-          onPlaybackFailed={reportHeroPlaybackFailed}
-        />
-      </motion.div>
+      {/* Scrim. Only meaningful over real footage — over the placeholder field
+          it fades away.
 
-      {/* Scrim. Only meaningful over real footage — over the warm-white placeholder it
-          fades away so the panel keeps its warmth.
-
-          Directional rather than flat: the copy sits at the inline start, so the
-          wash is heaviest there and thins out across the frame, leaving the
-          right-hand side of the footage genuinely visible. A second, softer
-          bottom gradient keeps the scroll cue and the buttons readable. */}
+          Directional rather than flat: the copy sits at the inline start, so
+          the wash is heaviest there and thins out across the frame, leaving
+          the end side of the footage genuinely visible. A second, softer
+          bottom gradient keeps the scroll cue readable. */}
       <div
         aria-hidden="true"
         className={`absolute inset-0 transition-opacity duration-700 ease-out-strong ${
           hasDarkMedia ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-ink/75 via-ink/45 to-ink/15" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink/65 via-ink/35 to-ink/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/45 to-transparent" />
       </div>
 
       {/* Content */}
@@ -113,7 +65,7 @@ export default function Hero() {
             }`}
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(12px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
-            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1], delay: 0.1 }}
+            transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: 0.05 }}
           >
             {hero.eyebrow}
           </motion.p>
@@ -122,9 +74,13 @@ export default function Hero() {
             className={`mt-6 text-[clamp(2.5rem,6.5vw,4.5rem)] leading-[1.05] transition-colors duration-700 ${
               hasDarkMedia ? "text-warm-white" : "text-ink"
             }`}
-            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(18px)" }}
-            animate={{ opacity: 1, transform: "translateY(0px)" }}
-            transition={{ duration: 0.85, ease: [0.23, 1, 0.32, 1], delay: 0.18 }}
+            initial={
+              prefersReducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, transform: "translateY(14px)", filter: "blur(6px)" }
+            }
+            animate={{ opacity: 1, transform: "translateY(0px)", filter: "blur(0px)" }}
+            transition={{ duration: 0.55, ease: [0.23, 1, 0.32, 1], delay: 0.11 }}
           >
             {hero.headline}
           </motion.h1>
@@ -133,24 +89,24 @@ export default function Hero() {
             className={`mt-6 max-w-lg text-[0.9375rem] leading-[1.75] transition-colors duration-700 ${
               hasDarkMedia ? "text-warm-white/85" : "text-ink-muted"
             }`}
-            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(14px)" }}
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(12px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
-            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.28 }}
+            transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: 0.18 }}
           >
             {hero.body}
           </motion.p>
 
           <motion.div
             className="mt-10 flex flex-wrap items-center gap-4"
-            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(14px)" }}
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(12px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
-            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.36 }}
+            transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: 0.25 }}
           >
             <a
               href={contact.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="pressable inline-flex items-center gap-2.5 bg-ink px-7 py-4 text-[0.8125rem] font-medium uppercase tracking-wide2 text-warm-white hover:bg-ink"
+              className="pressable inline-flex items-center gap-2.5 bg-ink px-7 py-4 text-[0.8125rem] font-medium uppercase tracking-wide2 text-warm-white hover:bg-sage-deep"
             >
               <WhatsAppIcon className="h-4 w-4" />
               {hero.primaryCta}

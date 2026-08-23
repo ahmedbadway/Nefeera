@@ -45,6 +45,13 @@ import { useMediaQuery } from "../utils/UseMediaQuery.js";
  * @param {(failed: boolean) => void} [props.onPlaybackFailed]
  *   Called when a video file exists but will not play, so the surrounding
  *   layout can stop styling itself for dark media it is not actually getting.
+ * @param {boolean} [props.hideControl] Suppress the built-in play/pause button.
+ *   Set by FixedVideoBackdrop, which renders its own control OUTSIDE the
+ *   aria-hidden media layer — the WCAG 2.2.2 obligation moves with it.
+ * @param {React.RefObject} [props.videoRef] External ref attached to the
+ *   <video> element, so a parent that hid the control can drive playback.
+ * @param {(isPlaying: boolean) => void} [props.onPlayStateChange] Play/pause
+ *   notifications for the same external control.
  */
 export default function VideoAsset({
   desktopSrc,
@@ -57,6 +64,9 @@ export default function VideoAsset({
   className = "",
   objectPositionClass = "object-center",
   onPlaybackFailed,
+  hideControl = false,
+  videoRef = null,
+  onPlayStateChange,
 }) {
   const prefersReducedMotion = useReducedMotion();
   const isPhone = useMediaQuery("(max-width: 767px)");
@@ -66,7 +76,8 @@ export default function VideoAsset({
   const [playbackFailed, setPlaybackFailed] = useState(false);
   const [posterFailed, setPosterFailed] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const videoRef = useRef(null);
+  const fallbackVideoRef = useRef(null);
+  const resolvedVideoRef = videoRef || fallbackVideoRef;
 
   useEffect(() => {
     let active = true;
@@ -107,19 +118,19 @@ export default function VideoAsset({
   const videoAvailable = sources.length > 0 && !playbackFailed;
   const posterAvailable = Boolean(available?.poster) && !posterFailed;
 
-  // The hero film loops wherever the browser allows it, including under
-  // prefers-reduced-motion. That is a deliberate client decision, taken with the
-  // trade-off understood: this is a decorative background rather than content,
-  // and a pause control is always available, which is what WCAG 2.2.2 actually
-  // asks for. Reduced motion still governs everything else on the page — the
-  // scroll reveals and the hero parallax both stay off.
+  // The film does NOT autoplay under prefers-reduced-motion. (This reverses an
+  // earlier deliberate decision to loop regardless — with the film now behind
+  // the ENTIRE page rather than one hero, a permanently moving background is
+  // exactly what that setting exists to refuse.) The video still mounts,
+  // paused, with preload="auto" so a first frame paints, and the play control
+  // remains available for visitors who want the film anyway.
   //
-  // Note this cannot force playback everywhere: iOS in Low Power Mode refuses
-  // autoplay outright, no matter the markup. That is exactly why the control
-  // below exists.
+  // Autoplay also cannot be forced everywhere: iOS in Low Power Mode refuses
+  // it outright, no matter the markup. That is the other reason the control
+  // exists.
   const showPoster = posterAvailable && !videoAvailable;
   const showVideo = videoAvailable;
-  const autoPlayVideo = showVideo;
+  const autoPlayVideo = showVideo && !prefersReducedMotion;
 
   const specSource = (isPhone && mobileSrc) || desktopSrc;
   const spec = getAssetSpec(specSource);
@@ -196,11 +207,11 @@ export default function VideoAsset({
           the only way to start the film on a device that refuses to autoplay —
           iOS in Low Power Mode blocks autoplay outright, no matter what the
           markup says, so without this the video simply never moves there. */}
-      {fill && showVideo ? (
+      {fill && showVideo && !hideControl ? (
         <button
           type="button"
           onClick={() => {
-            const video = videoRef.current;
+            const video = resolvedVideoRef.current;
             if (!video) return;
             if (video.paused) {
               video.loop = true;
@@ -252,11 +263,17 @@ export default function VideoAsset({
           // paint nothing at all. This guarantees there is a frame to show.
           preload="auto"
           poster={available?.poster ? resolveAssetPath(poster) : undefined}
-          ref={videoRef}
+          ref={resolvedVideoRef}
           aria-hidden="true"
           tabIndex={-1}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
+          onPlay={() => {
+            setIsPlaying(true);
+            onPlayStateChange?.(true);
+          }}
+          onPause={() => {
+            setIsPlaying(false);
+            onPlayStateChange?.(false);
+          }}
           onError={() => {
             // The file is there but the browser will not play it — a missing
             // codec, a corrupt upload, a decode error. Fall back to the
