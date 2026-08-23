@@ -145,6 +145,25 @@ stand-in for the real logo, not a replacement for it.
 ${header}
 ${rowsFor((spec) => spec.kind === "video")}
 
+### If the hero video looks soft on a desktop screen
+
+Resolution is the whole story here. A 464x832 clip (a typical WhatsApp or
+social export) stretched across a 1440px screen is being enlarged more than
+three times, and no amount of code can put back detail the file does not have.
+
+Two separate things to check:
+
+1. **Re-export from the ORIGINAL recording, not from a shared copy.** Phones
+   record at 1080x1920 or better; the version that came out of a chat app is a
+   fraction of that. Sending the original by AirDrop, Google Drive, or email
+   "actual size" keeps the resolution.
+2. **Landscape footage suits a desktop background; vertical footage does not.**
+   A vertical clip used as a full-screen desktop background can only ever show
+   its middle strip — roughly a third of the height — because the rest falls
+   outside a wide frame. That is cropping, not blur, and a bigger file will not
+   change it. If there is any horizontal footage, use it for
+   \`hero-desktop.mp4\` and keep the vertical clip for \`hero-mobile.mp4\`.
+
 The hero works with **any one** of these three files — you do not need all
 three. But each one earns its place:
 

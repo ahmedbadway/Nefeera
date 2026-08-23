@@ -35,7 +35,10 @@ import { mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from "node
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-import { assetSpecs, getAssetFilename } from "../src/data/Content.js";
+import { content, assetSpecs, getAssetFilename } from "../src/data/Content.js";
+
+/** Derived, not hardcoded — the gallery length is a content decision. */
+const GALLERY_SLOTS = content.assets.gallery.length;
 
 /** Where `npm install -g` puts packages on this machine, if npm can say. */
 function globalNodeModules() {
@@ -383,7 +386,10 @@ async function run() {
         await swapPage.waitForTimeout(900);
 
         const loadedImages = await swapPage.locator("#gallery img").count();
-        check(loadedImages === 9, `9 gallery images now rendering (found ${loadedImages})`);
+        check(
+          loadedImages === GALLERY_SLOTS,
+          `all ${GALLERY_SLOTS} gallery images now rendering (found ${loadedImages})`
+        );
 
         const remainingPlaceholders = await swapPage
           .locator('#gallery [role="img"][aria-label*="placeholder"]')

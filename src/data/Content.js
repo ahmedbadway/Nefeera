@@ -212,6 +212,8 @@ export const content = {
       "/assets/images/case-03.jpg",
       "/assets/images/case-04.jpg",
     ],
+    // Seven gallery slots. To add an eighth, add the path here AND a matching
+    // entry in `assetSpecs` below, then run `npm run assets`.
     gallery: [
       "/assets/images/gallery-01.jpg",
       "/assets/images/gallery-02.jpg",
@@ -220,8 +222,6 @@ export const content = {
       "/assets/images/gallery-05.jpg",
       "/assets/images/gallery-06.jpg",
       "/assets/images/gallery-07.jpg",
-      "/assets/images/gallery-08.jpg",
-      "/assets/images/gallery-09.jpg",
     ],
   },
 };
@@ -241,12 +241,12 @@ export const assetSpecs = {
   // ---- Hero video ----------------------------------------------------------
   "/assets/video/hero-desktop.mp4": {
     kind: "video",
-    w: 1080,
-    h: 1920,
-    ratio: "9/16",
+    w: 1920,
+    h: 1080,
+    ratio: "16/9",
     maxKB: 6000,
     usedIn:
-      "Hero background video — all screen sizes. The current file is vertical, so it is used everywhere.",
+      "Hero background video — desktop and tablet. Landscape. A vertical file works too, but wide screens will crop it to its middle band.",
     alt: "Nefeera wedding film",
   },
   "/assets/video/hero-mobile.mp4": {
@@ -261,21 +261,21 @@ export const assetSpecs = {
   },
   "/assets/video/hero.webm": {
     kind: "video",
-    w: 1080,
-    h: 1920,
-    ratio: "9/16",
+    w: 1920,
+    h: 1080,
+    ratio: "16/9",
     maxKB: 5000,
     usedIn:
-      "Hero background video — smaller WebM version, used first when the browser supports it",
+      "Hero background video — smaller WebM version of the landscape file, used first when the browser supports it",
     alt: "Nefeera wedding film",
   },
 
   // ---- Hero still ----------------------------------------------------------
   "/assets/images/hero-poster.jpg": {
     kind: "image",
-    w: 1080,
-    h: 1920,
-    ratio: "9/16",
+    w: 1920,
+    h: 1080,
+    ratio: "16/9",
     maxKB: 300,
     usedIn:
       "Hero — the still frame shown before the video plays, and instead of it on reduced-motion settings",
@@ -429,26 +429,6 @@ export const assetSpecs = {
     usedIn:
       "Gallery — column 3, first image (tall)",
     alt: "Wedding detail — gallery image 7",
-  },
-  "/assets/images/gallery-08.jpg": {
-    kind: "image",
-    w: 1200,
-    h: 1600,
-    ratio: "3/4",
-    maxKB: 400,
-    usedIn:
-      "Gallery — column 3, second image",
-    alt: "Wedding detail — gallery image 8",
-  },
-  "/assets/images/gallery-09.jpg": {
-    kind: "image",
-    w: 1080,
-    h: 1920,
-    ratio: "9/16",
-    maxKB: 400,
-    usedIn:
-      "Gallery — column 3, third image (tall)",
-    alt: "Wedding detail — gallery image 9",
   },
 };
 

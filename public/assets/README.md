@@ -47,13 +47,13 @@ with the same name and GitHub will offer to replace it.
 
 ## The checklist
 
-15 images and 3 video files in total. Tick them off as you go.
+13 images and 3 video files in total. Tick them off as you go.
 
 ### Images — put these in `public/assets/images/`
 
 | File name | Put it in | Exact size (pixels) | Shape | Max file size | Where it shows on the page |
 | --- | --- | --- | --- | --- | --- |
-| `hero-poster.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 300 KB | Hero — the still frame shown before the video plays, and instead of it on reduced-motion settings |
+| `hero-poster.jpg` | `assets/images/` | 1920 × 1080 | Wide (16:9) | 300 KB | Hero — the still frame shown before the video plays, and instead of it on reduced-motion settings |
 | `about-yomna.jpg` | `assets/images/` | 1200 × 1200 | Square (1:1) | 300 KB | About section — portrait of Yomna El Hadad |
 | `case-01.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 450 KB | Featured wedding — the opening image, beside the introduction copy |
 | `case-02.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Featured wedding — first image in the row of three |
@@ -66,8 +66,6 @@ with the same name and GitHub will offer to replace it.
 | `gallery-05.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Gallery — column 2, second image (tall) |
 | `gallery-06.jpg` | `assets/images/` | 1200 × 1600 | 3/4 | 400 KB | Gallery — column 2, third image |
 | `gallery-07.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Gallery — column 3, first image (tall) |
-| `gallery-08.jpg` | `assets/images/` | 1200 × 1600 | 3/4 | 400 KB | Gallery — column 3, second image |
-| `gallery-09.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Gallery — column 3, third image (tall) |
 
 ### Logo — put this in `public/assets/images/`
 
@@ -92,9 +90,28 @@ stand-in for the real logo, not a replacement for it.
 
 | File name | Put it in | Exact size (pixels) | Shape | Max file size | Where it shows on the page |
 | --- | --- | --- | --- | --- | --- |
-| `hero-desktop.mp4` | `assets/video/` | 1080 × 1920 | Tall phone (9:16) | 6 MB | Hero background video — all screen sizes. The current file is vertical, so it is used everywhere. |
+| `hero-desktop.mp4` | `assets/video/` | 1920 × 1080 | Wide (16:9) | 6 MB | Hero background video — desktop and tablet. Landscape. A vertical file works too, but wide screens will crop it to its middle band. |
 | `hero-mobile.mp4` | `assets/video/` | 1080 × 1920 | Tall phone (9:16) | 4 MB | Hero background video — phones. Same shape as the desktop file while the source footage is vertical. |
-| `hero.webm` | `assets/video/` | 1080 × 1920 | Tall phone (9:16) | 5 MB | Hero background video — smaller WebM version, used first when the browser supports it |
+| `hero.webm` | `assets/video/` | 1920 × 1080 | Wide (16:9) | 5 MB | Hero background video — smaller WebM version of the landscape file, used first when the browser supports it |
+
+### If the hero video looks soft on a desktop screen
+
+Resolution is the whole story here. A 464x832 clip (a typical WhatsApp or
+social export) stretched across a 1440px screen is being enlarged more than
+three times, and no amount of code can put back detail the file does not have.
+
+Two separate things to check:
+
+1. **Re-export from the ORIGINAL recording, not from a shared copy.** Phones
+   record at 1080x1920 or better; the version that came out of a chat app is a
+   fraction of that. Sending the original by AirDrop, Google Drive, or email
+   "actual size" keeps the resolution.
+2. **Landscape footage suits a desktop background; vertical footage does not.**
+   A vertical clip used as a full-screen desktop background can only ever show
+   its middle strip — roughly a third of the height — because the rest falls
+   outside a wide frame. That is cropping, not blur, and a bigger file will not
+   change it. If there is any horizontal footage, use it for
+   `hero-desktop.mp4` and keep the vertical clip for `hero-mobile.mp4`.
 
 The hero works with **any one** of these three files — you do not need all
 three. But each one earns its place:
