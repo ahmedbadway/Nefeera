@@ -468,9 +468,19 @@ async function run() {
     await scrollThrough(rmPage);
     await rmPage.waitForTimeout(700);
 
+    // Reduced motion means no MOVEMENT, not no picture: a video may be present
+    // so its first frame can stand in for a missing poster, but it must never
+    // autoplay or loop.
+    const rmVideo = await rmPage.evaluate(() => {
+      const videos = [...document.querySelectorAll("video")];
+      return {
+        count: videos.length,
+        autoplaying: videos.filter((v) => v.autoplay || v.loop || !v.paused).length,
+      };
+    });
     check(
-      (await rmPage.locator("video").count()) === 0,
-      "no <video> element under prefers-reduced-motion"
+      rmVideo.autoplaying === 0,
+      `no autoplaying video under prefers-reduced-motion (${rmVideo.count} present, ${rmVideo.autoplaying} moving)`
     );
 
     // Scroll reveals must not leave content invisible when motion is off.
