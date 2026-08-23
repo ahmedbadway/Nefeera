@@ -28,7 +28,6 @@ export default function About() {
               <div className="relative">
                 <Asset
                   src={assets.images.aboutYomna}
-                  ratio="4/5"
                   label="About — Yomna"
                   sizes="(max-width: 1024px) 100vw, 40vw"
                   className="w-full"

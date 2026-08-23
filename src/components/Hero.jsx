@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { motion, useMotionTemplate, useScroll, useTransform, useReducedMotion } from "motion/react";
 import { content } from "../data/Content.js";
-import { useHeroMedia } from "../utils/UseHeroMedia.js";
+import { useHeroMedia, reportHeroPlaybackFailed } from "../utils/UseHeroMedia.js";
 import VideoAsset from "./VideoAsset.jsx";
 import { WhatsAppIcon, ArrowIcon } from "./Icons.jsx";
 
@@ -50,9 +50,14 @@ export default function Hero() {
       aria-label={hero.headline}
     >
       {/* Media layer */}
+      {/* `transform` is always supplied, and set to "none" when parallax is off,
+          rather than dropping the style prop. Motion writes the transform to the
+          element directly; handing it `undefined` later leaves the last value in
+          place, so the layer stayed scaled 1.14 after a video failed to play —
+          shifting the poster and the placeholder label out of position. */}
       <motion.div
         className="absolute inset-0"
-        style={applyParallax ? { transform: parallaxTransform } : undefined}
+        style={{ transform: applyParallax ? parallaxTransform : "none" }}
       >
         <VideoAsset
           fill
@@ -61,6 +66,7 @@ export default function Hero() {
           webmSrc={assets.video.heroWebm}
           poster={assets.images.heroPoster}
           label="Hero video"
+          onPlaybackFailed={reportHeroPlaybackFailed}
         />
       </motion.div>
 

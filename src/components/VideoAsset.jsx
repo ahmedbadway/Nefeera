@@ -34,6 +34,9 @@ import { useMediaQuery } from "../utils/UseMediaQuery.js";
  * @param {string} [props.ratio]     Aspect-ratio box. Omit when `fill` is set.
  * @param {boolean} [props.fill]     Fill the nearest positioned parent instead of boxing itself.
  * @param {string} [props.className] Classes for the wrapper.
+ * @param {(failed: boolean) => void} [props.onPlaybackFailed]
+ *   Called when a video file exists but will not play, so the surrounding
+ *   layout can stop styling itself for dark media it is not actually getting.
  */
 export default function VideoAsset({
   desktopSrc,
@@ -44,6 +47,7 @@ export default function VideoAsset({
   ratio,
   fill = false,
   className = "",
+  onPlaybackFailed,
 }) {
   const prefersReducedMotion = useReducedMotion();
   const isPhone = useMediaQuery("(max-width: 767px)");
@@ -186,7 +190,14 @@ export default function VideoAsset({
           poster={available?.poster ? resolveAssetPath(poster) : undefined}
           aria-hidden="true"
           tabIndex={-1}
-          onError={() => setPlaybackFailed(true)}
+          onError={() => {
+            // The file is there but the browser will not play it — a missing
+            // codec, a corrupt upload, a decode error. Fall back to the
+            // placeholder and tell the parent, so a hero styled for dark video
+            // does not end up with cream type on a cream panel.
+            setPlaybackFailed(true);
+            onPlaybackFailed?.(true);
+          }}
         >
           {sources.map((source) => (
             <source

@@ -53,21 +53,21 @@ with the same name and GitHub will offer to replace it.
 
 | File name | Put it in | Exact size (pixels) | Shape | Max file size | Where it shows on the page |
 | --- | --- | --- | --- | --- | --- |
-| `hero-poster.jpg` | `assets/images/` | 1920 × 1080 | Wide (16:9) | 300 KB | Hero — the still frame shown before the video plays, and instead of it on reduced-motion settings |
-| `about-yomna.jpg` | `assets/images/` | 1200 × 1500 | Portrait (4:5) | 300 KB | About section — portrait of Yomna El Hadad |
-| `case-01.jpg` | `assets/images/` | 1800 × 1200 | Landscape (3:2) | 450 KB | Featured wedding — the wide opening image at the top of the section |
-| `case-02.jpg` | `assets/images/` | 1200 × 1500 | Portrait (4:5) | 400 KB | Featured wedding — tall image, left of the pair below the opening image |
-| `case-03.jpg` | `assets/images/` | 1200 × 1500 | Portrait (4:5) | 400 KB | Featured wedding — tall image, right of the pair below the opening image |
-| `case-04.jpg` | `assets/images/` | 1600 × 900 | Wide (16:9) | 400 KB | Featured wedding — the wide closing image at the bottom of the section |
-| `gallery-01.jpg` | `assets/images/` | 1200 × 1500 | Portrait (4:5) | 400 KB | Gallery — column 1, first image (tall) |
-| `gallery-02.jpg` | `assets/images/` | 1500 × 1000 | Landscape (3:2) | 400 KB | Gallery — column 1, second image (wide) |
-| `gallery-03.jpg` | `assets/images/` | 1200 × 1500 | Portrait (4:5) | 400 KB | Gallery — column 1, third image (tall) |
-| `gallery-04.jpg` | `assets/images/` | 1200 × 1200 | Square (1:1) | 400 KB | Gallery — column 2, first image (square) |
-| `gallery-05.jpg` | `assets/images/` | 1200 × 1500 | Portrait (4:5) | 400 KB | Gallery — column 2, second image (tall) |
-| `gallery-06.jpg` | `assets/images/` | 1500 × 1000 | Landscape (3:2) | 400 KB | Gallery — column 2, third image (wide) |
-| `gallery-07.jpg` | `assets/images/` | 1200 × 1500 | Portrait (4:5) | 400 KB | Gallery — column 3, first image (tall) |
-| `gallery-08.jpg` | `assets/images/` | 1200 × 1200 | Square (1:1) | 400 KB | Gallery — column 3, second image (square) |
-| `gallery-09.jpg` | `assets/images/` | 1500 × 1000 | Landscape (3:2) | 400 KB | Gallery — column 3, third image (wide) |
+| `hero-poster.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 300 KB | Hero — the still frame shown before the video plays, and instead of it on reduced-motion settings |
+| `about-yomna.jpg` | `assets/images/` | 1200 × 1200 | Square (1:1) | 300 KB | About section — portrait of Yomna El Hadad |
+| `case-01.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 450 KB | Featured wedding — the opening image, beside the introduction copy |
+| `case-02.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Featured wedding — first image in the row of three |
+| `case-03.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Featured wedding — second image in the row of three |
+| `case-04.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Featured wedding — third image in the row of three |
+| `gallery-01.jpg` | `assets/images/` | 1200 × 1600 | 3/4 | 400 KB | Gallery — column 1, first image |
+| `gallery-02.jpg` | `assets/images/` | 1200 × 1600 | 3/4 | 400 KB | Gallery — column 1, second image |
+| `gallery-03.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Gallery — column 1, third image (tall) |
+| `gallery-04.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Gallery — column 2, first image (tall) |
+| `gallery-05.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Gallery — column 2, second image (tall) |
+| `gallery-06.jpg` | `assets/images/` | 1200 × 1600 | 3/4 | 400 KB | Gallery — column 2, third image |
+| `gallery-07.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Gallery — column 3, first image (tall) |
+| `gallery-08.jpg` | `assets/images/` | 1200 × 1600 | 3/4 | 400 KB | Gallery — column 3, second image |
+| `gallery-09.jpg` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Gallery — column 3, third image (tall) |
 
 ### Logo — put this in `public/assets/images/`
 
@@ -92,9 +92,9 @@ stand-in for the real logo, not a replacement for it.
 
 | File name | Put it in | Exact size (pixels) | Shape | Max file size | Where it shows on the page |
 | --- | --- | --- | --- | --- | --- |
-| `hero-desktop.mp4` | `assets/video/` | 1920 × 1080 | Wide (16:9) | 6 MB | Hero background video — desktop and tablet (768px and wider) |
-| `hero-mobile.mp4` | `assets/video/` | 1080 × 1920 | Tall phone (9:16) | 4 MB | Hero background video — phones (below 768px), portrait crop |
-| `hero.webm` | `assets/video/` | 1920 × 1080 | Wide (16:9) | 5 MB | Hero background video — smaller WebM version, used first when the browser supports it |
+| `hero-desktop.mp4` | `assets/video/` | 1080 × 1920 | Tall phone (9:16) | 6 MB | Hero background video — all screen sizes. The current file is vertical, so it is used everywhere. |
+| `hero-mobile.mp4` | `assets/video/` | 1080 × 1920 | Tall phone (9:16) | 4 MB | Hero background video — phones. Same shape as the desktop file while the source footage is vertical. |
+| `hero.webm` | `assets/video/` | 1080 × 1920 | Tall phone (9:16) | 5 MB | Hero background video — smaller WebM version, used first when the browser supports it |
 
 The hero works with **any one** of these three files — you do not need all
 three. But each one earns its place:

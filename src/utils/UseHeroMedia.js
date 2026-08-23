@@ -1,6 +1,30 @@
+import { useEffect, useReducer } from "react";
 import { useReducedMotion } from "motion/react";
 import { content } from "../data/Content.js";
 import { useAssetExists, useFirstAvailableAsset } from "./AssetProbe.js";
+
+/**
+ * Whether the hero video failed to actually PLAY, as opposed to failing to exist.
+ *
+ * The probe answers "is the file on the server". That is not the same question as
+ * "is there a dark moving picture behind the headline right now". A file can be
+ * present and still not play: a codec the browser lacks, a corrupt upload, a
+ * decode error. When that happens VideoAsset drops back to the cream placeholder
+ * — and if the hero and header were still styling themselves for video, cream
+ * type would be sitting on a cream panel, invisible.
+ *
+ * Hero, Nav, and VideoAsset are siblings rather than parent and child, so this is
+ * a tiny module-level store rather than a context: VideoAsset reports, the other
+ * two re-render.
+ */
+let heroPlaybackFailed = false;
+const playbackListeners = new Set();
+
+export function reportHeroPlaybackFailed(failed) {
+  if (heroPlaybackFailed === failed) return;
+  heroPlaybackFailed = failed;
+  playbackListeners.forEach((notify) => notify());
+}
 
 /**
  * What is actually behind the hero copy right now?
@@ -32,6 +56,15 @@ export function useHeroMedia() {
   const prefersReducedMotion = useReducedMotion();
   const { video, images } = content.assets;
 
+  // Re-render this consumer whenever playback state changes.
+  const [, forceUpdate] = useReducer((n) => n + 1, 0);
+  useEffect(() => {
+    playbackListeners.add(forceUpdate);
+    return () => {
+      playbackListeners.delete(forceUpdate);
+    };
+  }, []);
+
   const videoProbe = useFirstAvailableAsset([
     video.heroWebm,
     video.heroDesktop,
@@ -39,7 +72,8 @@ export function useHeroMedia() {
   ]);
   const posterStatus = useAssetExists(images.heroPoster);
 
-  const hasVideo = videoProbe.status === "present";
+  // A file that exists but cannot play is not media, for styling purposes.
+  const hasVideo = videoProbe.status === "present" && !heroPlaybackFailed;
   const hasPoster = posterStatus === "present";
 
   const hasDarkMedia = prefersReducedMotion ? hasPoster : hasVideo || hasPoster;
