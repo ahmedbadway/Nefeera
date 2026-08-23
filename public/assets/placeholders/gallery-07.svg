@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Gallery 07 placeholder. Required file: gallery-07.jpg — 1080×1920">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Gallery 07 placeholder. Required file: gallery-07.webp — 1080×1920">
   <rect width="1080" height="1920" fill="#E7EDE2" />
   
   <rect x="21.60" y="21.60" width="1036.80" height="1876.80" fill="none" stroke="#7A683F" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.55" />
@@ -11,5 +11,5 @@
   <text x="540.00" y="949.20" text-anchor="middle" font-family="Italiana, Georgia, serif" font-size="62.64" letter-spacing="11.28" fill="#252E28" opacity="0.9">NEFEERA</text>
   <line x1="378.00" y1="1008.60" x2="702.00" y2="1008.60" stroke="#7A683F" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.7" />
   <text x="540.00" y="1100.40" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="47.52" letter-spacing="4.75" fill="#252E28">Gallery 07</text>
-  <text x="540.00" y="1168.12" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="41.04" fill="#5A665C">gallery-07.jpg — 1080×1920</text>
+  <text x="540.00" y="1168.12" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="41.04" fill="#5A665C">gallery-07.webp — 1080×1920</text>
 </svg>
