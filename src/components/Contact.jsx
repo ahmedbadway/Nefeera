@@ -28,10 +28,13 @@ export default function Contact() {
     <section
       id="contact"
       aria-labelledby="contact-heading"
-      className="relative bg-ink py-24 text-warm-white sm:py-32 lg:py-40"
+      className="relative py-16 sm:py-20 lg:py-24"
     >
       <div className="shell">
-        <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
+        {/* The one dark panel on the page — a deep ink glass that still lets
+            the film glow through at the edges. Warm-white text on the 0.82
+            fill holds contrast over even white footage (see Global.css). */}
+        <div className="glass-dark grid grid-cols-1 gap-14 rounded-3xl p-6 text-warm-white sm:p-10 lg:grid-cols-12 lg:gap-16 lg:p-14">
           <div className="lg:col-span-7">
             <Reveal>
               <p className="eyebrow text-champagne">{contact.eyebrow}</p>

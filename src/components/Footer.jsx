@@ -17,7 +17,10 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative z-10 bg-ink text-warm-white">
+    // Full-width dark glass strip, no radius and no bottom gap — the page
+    // ends solid rather than floating. border-0 drops the panel hairline;
+    // the champagne rule inside is the footer's top edge.
+    <footer className="glass-dark relative z-10 border-0 text-warm-white">
       <div className="shell">
         <div className="grid grid-cols-1 gap-12 border-t border-champagne/30 py-16 lg:grid-cols-12 lg:gap-16 lg:py-20">
           <div className="lg:col-span-5">

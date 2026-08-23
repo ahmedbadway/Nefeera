@@ -109,7 +109,7 @@ export default function Asset({
           decoding="async"
           onLoad={() => setStatus("loaded")}
           onError={() => setStatus("error")}
-          className={`absolute inset-0 h-full w-full transition-opacity duration-700 ease-out-strong ${imgClassName}`}
+          className={`absolute inset-0 h-full w-full transition-opacity duration-500 ease-out-strong ${imgClassName}`}
           style={{
             // object-fit/position set inline rather than via utility classes so
             // a caller-supplied className can never win the specificity race and
