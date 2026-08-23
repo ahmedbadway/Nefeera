@@ -93,9 +93,21 @@ export default function VideoAsset({
     return list;
   }, [available, isPhone, webmSrc, desktopSrc, mobileSrc]);
 
-  const showVideo = !prefersReducedMotion && sources.length > 0 && !playbackFailed;
-  const showPoster =
-    Boolean(available?.poster) && !posterFailed && (prefersReducedMotion || !showVideo);
+  const videoAvailable = sources.length > 0 && !playbackFailed;
+  const posterAvailable = Boolean(available?.poster) && !posterFailed;
+
+  // REDUCED MOTION MEANS NO MOVEMENT, NOT NO PICTURE.
+  // This used to drop the video entirely and fall back to the poster — which
+  // left anyone with reduced motion on staring at an empty cream panel whenever
+  // no poster had been uploaded. That is not a rare setting either: iOS turns
+  // Reduce Motion ON automatically in Low Power Mode, so a phone below 20%
+  // battery got the blank hero.
+  //
+  // Now the still comes from the poster when there is one, and otherwise from
+  // the video's own first frame, held paused. Motionless either way.
+  const showPoster = posterAvailable && (prefersReducedMotion || !videoAvailable);
+  const showVideo = videoAvailable && !showPoster;
+  const autoPlayVideo = showVideo && !prefersReducedMotion;
 
   // Under reduced motion the file this slot is actually waiting for is the
   // poster, not the video — so that is what the placeholder should ask for.
@@ -180,13 +192,15 @@ export default function VideoAsset({
 
       {showVideo ? (
         <video
-          key={sources.map((source) => source.src).join("|")}
+          key={`${autoPlayVideo}-${sources.map((source) => source.src).join("|")}`}
           className="absolute inset-0 h-full w-full object-cover"
-          autoPlay
+          autoPlay={autoPlayVideo}
           muted
-          loop
+          loop={autoPlayVideo}
           playsInline
-          preload="metadata"
+          // Paused, we need the first frame actually painted rather than a blank
+          // box, so load enough to have one.
+          preload={autoPlayVideo ? "metadata" : "auto"}
           poster={available?.poster ? resolveAssetPath(poster) : undefined}
           aria-hidden="true"
           tabIndex={-1}
@@ -202,7 +216,14 @@ export default function VideoAsset({
           {sources.map((source) => (
             <source
               key={source.src}
-              src={resolveAssetPath(source.src)}
+              // The #t=0.1 media fragment tells the browser which frame to paint
+              // while paused. Without it Safari renders nothing until playback
+              // starts — which, for a video held paused, is never.
+              src={
+                autoPlayVideo
+                  ? resolveAssetPath(source.src)
+                  : `${resolveAssetPath(source.src)}#t=0.1`
+              }
               type={source.type}
             />
           ))}

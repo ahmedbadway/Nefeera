@@ -1,5 +1,4 @@
 import { useEffect, useReducer } from "react";
-import { useReducedMotion } from "motion/react";
 import { content } from "../data/Content.js";
 import { useAssetExists, useFirstAvailableAsset } from "./AssetProbe.js";
 
@@ -53,7 +52,6 @@ export function reportHeroPlaybackFailed(failed) {
  * @returns {{ hasVideo: boolean, hasPoster: boolean, hasDarkMedia: boolean }}
  */
 export function useHeroMedia() {
-  const prefersReducedMotion = useReducedMotion();
   const { video, images } = content.assets;
 
   // Re-render this consumer whenever playback state changes.
@@ -76,7 +74,10 @@ export function useHeroMedia() {
   const hasVideo = videoProbe.status === "present" && !heroPlaybackFailed;
   const hasPoster = posterStatus === "present";
 
-  const hasDarkMedia = prefersReducedMotion ? hasPoster : hasVideo || hasPoster;
+  // Reduced motion no longer removes the picture — VideoAsset holds the video's
+  // first frame paused when there is no poster — so the same media counts in
+  // both cases. Only a genuinely absent or unplayable file leaves the hero light.
+  const hasDarkMedia = hasVideo || hasPoster;
 
   return { hasVideo, hasPoster, hasDarkMedia };
 }
