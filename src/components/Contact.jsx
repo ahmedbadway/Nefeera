@@ -1,4 +1,5 @@
 import { content } from "../data/Content.js";
+import Button from "./Button.jsx";
 import Reveal from "./Reveal.jsx";
 import { WhatsAppIcon, InstagramIcon, MailIcon, ArrowIcon } from "./Icons.jsx";
 
@@ -52,15 +53,18 @@ export default function Contact() {
             </Reveal>
 
             <Reveal delay={0.18}>
-              <a
+              <Button
                 href={contact.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="pressable mt-10 inline-flex items-center gap-3 bg-warm-white px-8 py-[1.125rem] text-[0.8125rem] font-medium uppercase tracking-wide2 text-ink hover:bg-champagne"
+                variant="primary"
+                tone="dark"
+                icon={<WhatsAppIcon className="h-[1.125rem] w-[1.125rem]" />}
+                arrow
+                className="mt-10"
               >
-                <WhatsAppIcon className="h-[1.125rem] w-[1.125rem]" />
                 {contact.whatsappCta}
-              </a>
+              </Button>
             </Reveal>
           </div>
 

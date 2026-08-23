@@ -7,6 +7,7 @@ import {
   useScroll,
 } from "motion/react";
 import { content } from "../data/Content.js";
+import Button from "./Button.jsx";
 import Logo from "./Logo.jsx";
 import { MenuIcon, CloseIcon, WhatsAppIcon } from "./Icons.jsx";
 
@@ -171,16 +172,18 @@ export default function Nav() {
                   </a>
                 ))}
 
-                <a
+                <Button
                   href={contact.whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMenuOpen(false)}
-                  className="pressable mt-9 inline-flex items-center justify-center gap-2.5 rounded-full bg-ink px-6 py-4 text-[0.6875rem] font-medium uppercase tracking-wide2 text-warm-white hover:bg-sage-deep"
+                  variant="primary"
+                  tone="light"
+                  icon={<WhatsAppIcon className="h-4 w-4" />}
+                  className="mt-9 justify-center"
                 >
-                  <WhatsAppIcon className="h-4 w-4" />
                   {nav.cta}
-                </a>
+                </Button>
               </nav>
             </div>
           </motion.div>

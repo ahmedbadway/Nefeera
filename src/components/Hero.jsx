@@ -1,7 +1,8 @@
 import { motion, useReducedMotion } from "motion/react";
 import { content } from "../data/Content.js";
 import { useHeroMedia } from "../utils/UseHeroMedia.js";
-import { WhatsAppIcon, ArrowIcon } from "./Icons.jsx";
+import Button from "./Button.jsx";
+import { WhatsAppIcon } from "./Icons.jsx";
 
 /**
  * Full-height opening section.
@@ -102,27 +103,25 @@ export default function Hero() {
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: 0.25 }}
           >
-            <a
+            <Button
               href={contact.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="pressable inline-flex items-center gap-2.5 bg-ink px-7 py-4 text-[0.8125rem] font-medium uppercase tracking-wide2 text-warm-white hover:bg-sage-deep"
+              variant="primary"
+              tone={hasDarkMedia ? "dark" : "light"}
+              icon={<WhatsAppIcon className="h-4 w-4" />}
             >
-              <WhatsAppIcon className="h-4 w-4" />
               {hero.primaryCta}
-            </a>
+            </Button>
 
-            <a
+            <Button
               href={hero.secondaryHref}
-              className={`pressable group inline-flex items-center gap-2.5 border px-7 py-4 text-[0.8125rem] font-medium uppercase tracking-wide2 transition-colors duration-300 ${
-                hasDarkMedia
-                  ? "border-warm-white/50 text-warm-white hover:border-champagne hover:text-champagne"
-                  : "border-ink/25 text-ink hover:border-sage-deep hover:text-sage-deep"
-              }`}
+              variant="ghost"
+              tone={hasDarkMedia ? "dark" : "light"}
+              arrow
             >
               {hero.secondaryCta}
-              <ArrowIcon className="h-4 w-4 transition-transform duration-300 ease-out-strong group-hover:translate-x-1" />
-            </a>
+            </Button>
           </motion.div>
         </div>
 

@@ -144,7 +144,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
               ref={closeButtonRef}
               type="button"
               onClick={onClose}
-              className="pressable inline-flex h-11 w-11 items-center justify-center text-warm-white hover:text-champagne"
+              className="glass-pill-dark pressable inline-flex h-11 w-11 items-center justify-center rounded-full text-warm-white hover:text-champagne"
             >
               <span className="sr-only-focusable">{copy.close}</span>
               <CloseIcon className="h-6 w-6" />
@@ -187,7 +187,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
             <button
               type="button"
               onClick={goPrevious}
-              className="pressable inline-flex h-12 w-12 items-center justify-center border border-warm-white/25 text-warm-white hover:border-champagne hover:text-champagne"
+              className="glass-pill-dark pressable inline-flex h-12 w-12 items-center justify-center rounded-full text-warm-white hover:text-champagne"
             >
               <span className="sr-only-focusable">{copy.previous}</span>
               <ChevronIcon className="h-5 w-5" direction="start" />
@@ -196,7 +196,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
             <button
               type="button"
               onClick={goNext}
-              className="pressable inline-flex h-12 w-12 items-center justify-center border border-warm-white/25 text-warm-white hover:border-champagne hover:text-champagne"
+              className="glass-pill-dark pressable inline-flex h-12 w-12 items-center justify-center rounded-full text-warm-white hover:text-champagne"
             >
               <span className="sr-only-focusable">{copy.next}</span>
               <ChevronIcon className="h-5 w-5" direction="end" />
