@@ -27,8 +27,10 @@ import { resolveAssetPath } from "../utils/ResolveAssetPath.js";
  * scale with the type system, and are read correctly by screen readers.
  *
  * @param {object} props
- * @param {"full"|"wordmark"|"mark"} [props.variant] Which parts to show.
- * @param {"dark"|"light"} [props.color] "light" = cream, for use over the hero video.
+ * @param {"full"|"wordmark"|"mark"|"inline"} [props.variant] Which parts to
+ *   show. "inline" is mark + wordmark on one horizontal line — the stacked
+ *   lockup is too tall for the floating nav pill.
+ * @param {"dark"|"light"} [props.color] "light" = warm-white, for use over dark media.
  * @param {"xs"|"sm"|"md"|"lg"} [props.size] Type scale of the lockup.
  * @param {string} [props.className] Classes for the wrapper.
  */
@@ -123,15 +125,47 @@ export default function Logo({
 
   const accessibleName = `${brand.name} — ${brand.subline}, ${brand.discipline}`;
 
-  // A real logo file was found: it replaces the whole drawn lockup.
+  // A real logo file was found: it replaces the whole drawn lockup. The inline
+  // variant caps the height lower — it has one line of pill to live in.
   if (uploaded.status === "present" && uploaded.src) {
     return (
       <img
         src={resolveAssetPath(uploaded.src)}
         alt={accessibleName}
         className={`block w-auto ${className}`}
-        style={{ height: `calc(${scale.mark} + ${scale.wordmark} * 2.2)` }}
+        style={{
+          height:
+            variant === "inline"
+              ? `calc(${scale.mark} * 1.5)`
+              : `calc(${scale.mark} + ${scale.wordmark} * 2.2)`,
+        }}
       />
+    );
+  }
+
+  if (variant === "inline") {
+    return (
+      <span
+        className={`inline-flex items-center ${className}`}
+        style={{ gap: "0.625rem", lineHeight: 1 }}
+      >
+        <NefeeraMark color={palette.mark} size={scale.mark} />
+        <span
+          className="font-display uppercase"
+          style={{
+            fontSize: `calc(${scale.wordmark} * 1.1)`,
+            letterSpacing: "0.18em",
+            color: palette.wordmark,
+            fontWeight: 400,
+            lineHeight: 1,
+            // Nudge the optical baseline: Italiana's caps sit a hair high
+            // beside the mark's bowl at these sizes.
+            transform: "translateY(0.06em)",
+          }}
+        >
+          {brand.name}
+        </span>
+      </span>
     );
   }
 
