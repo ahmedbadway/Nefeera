@@ -23,7 +23,6 @@ export default {
         "warm-white": "oklch(var(--warm-white) / <alpha-value>)",
         gold: "oklch(var(--gold) / <alpha-value>)",
         "gold-soft": "oklch(var(--gold-soft) / <alpha-value>)",
-        "cream-deep": "oklch(var(--cream-deep) / <alpha-value>)",
         charcoal: "oklch(var(--charcoal) / <alpha-value>)",
         "charcoal-muted": "oklch(var(--charcoal-muted) / <alpha-value>)",
         // Scoped to the FeaturedWedding section only.
@@ -34,26 +33,11 @@ export default {
         body: ["Inter", "system-ui", "-apple-system", "'Segoe UI'", "sans-serif"],
       },
       letterSpacing: {
-        wordmark: "0.18em",
         wide2: "0.22em",
         wide3: "0.32em",
       },
-      maxWidth: {
-        shell: "var(--shell-max)",
-      },
       transitionTimingFunction: {
         "out-strong": "var(--ease-out)",
-        "in-out-strong": "var(--ease-in-out)",
-        drawer: "var(--ease-drawer)",
-      },
-      keyframes: {
-        shimmer: {
-          "0%": { transform: "translateX(-120%)" },
-          "100%": { transform: "translateX(220%)" },
-        },
-      },
-      animation: {
-        shimmer: "shimmer 6s var(--ease-in-out) infinite",
       },
     },
   },

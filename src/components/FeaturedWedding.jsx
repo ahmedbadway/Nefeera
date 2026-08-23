@@ -72,9 +72,9 @@ export default function FeaturedWedding() {
                 src={assets.cases[0]}
                 label="Case 01"
                 sizes="(max-width: 1024px) 100vw, 33vw"
-                className="w-full"
+                className="glass-frame-dark w-full"
               />
-              <figcaption className="mt-4 text-[0.75rem] uppercase tracking-wide2 text-cream/60">
+              <figcaption className="mt-3.5 text-[0.6875rem] uppercase tracking-wide2 text-cream/55">
                 {featured.captions[0]}
               </figcaption>
             </figure>
@@ -84,14 +84,14 @@ export default function FeaturedWedding() {
             <div className="space-y-5">
               {featured.body.map((paragraph, index) => (
                 <Reveal key={paragraph.slice(0, 32)} delay={index * 0.06}>
-                  <p className="text-[1.0625rem] leading-[1.8] text-cream/80">{paragraph}</p>
+                  <p className="text-[0.9375rem] leading-[1.8] text-cream/80">{paragraph}</p>
                 </Reveal>
               ))}
             </div>
 
             <Reveal delay={0.16}>
               <blockquote className="mt-12 border-s-2 border-gold-soft ps-7">
-                <p className="font-display text-[clamp(1.5rem,3vw,2.125rem)] italic leading-[1.35] text-cream">
+                <p className="font-display text-[clamp(1.125rem,2vw,1.5rem)] italic leading-[1.4] text-cream">
                   {featured.pullQuote}
                 </p>
               </blockquote>
@@ -110,9 +110,9 @@ export default function FeaturedWedding() {
                   src={assets.cases[caseIndex]}
                   label={`Case 0${caseIndex + 1}`}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="w-full"
+                  className="glass-frame-dark w-full"
                 />
-                <figcaption className="mt-4 text-[0.75rem] uppercase tracking-wide2 text-cream/60">
+                <figcaption className="mt-3.5 text-[0.6875rem] uppercase tracking-wide2 text-cream/55">
                   {featured.captions[caseIndex]}
                 </figcaption>
               </figure>

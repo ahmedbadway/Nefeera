@@ -25,7 +25,7 @@ export default function About() {
           {/* Portrait */}
           <div className="lg:col-span-5 lg:pt-16">
             <Reveal>
-              <div className="relative">
+              <div className="glass-frame relative">
                 <Asset
                   src={assets.images.aboutYomna}
                   label="About — Yomna"
@@ -51,7 +51,7 @@ export default function About() {
             />
 
             <Reveal delay={0.1}>
-              <p className="mt-8 font-display text-[clamp(1.375rem,2.4vw,1.75rem)] leading-[1.4] text-charcoal">
+              <p className="mt-8 font-display text-[clamp(1.125rem,1.9vw,1.4375rem)] leading-[1.45] text-charcoal">
                 {about.lead}
               </p>
             </Reveal>
@@ -59,7 +59,7 @@ export default function About() {
             <div className="mt-8 space-y-5">
               {about.body.map((paragraph, index) => (
                 <Reveal key={paragraph.slice(0, 32)} delay={0.14 + index * 0.05}>
-                  <p className="text-[1.0625rem] leading-[1.8] text-charcoal-muted">
+                  <p className="text-[0.9375rem] leading-[1.8] text-charcoal-muted">
                     {paragraph}
                   </p>
                 </Reveal>
@@ -76,10 +76,10 @@ export default function About() {
                     key={stat.value}
                     className="border-gold/25 py-7 pe-6 sm:border-e sm:last:border-e-0"
                   >
-                    <dt className="font-display text-[1.5rem] leading-none text-charcoal">
+                    <dt className="font-display text-[1.25rem] leading-none text-charcoal">
                       {stat.value}
                     </dt>
-                    <dd className="mt-2.5 text-[0.8125rem] leading-relaxed text-charcoal-muted">
+                    <dd className="mt-2 text-[0.75rem] leading-relaxed text-charcoal-muted">
                       {stat.label}
                     </dd>
                   </div>

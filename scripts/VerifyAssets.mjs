@@ -202,8 +202,15 @@ async function run() {
     for (const viewport of VIEWPORTS) {
       console.log(`\n[${viewport.name} — ${viewport.width}x${viewport.height}]`);
 
+      // Reduced motion here is about MEASUREMENT, not accessibility (Phase 3
+      // covers that). Reveal animates elements in from 14px below; catching one
+      // mid-flight makes the geometry comparison a race against the animation
+      // rather than a test of layout, and produces phantom 14px "shifts".
+      // With motion off, Reveal renders untransformed and the numbers are the
+      // real layout.
       const context = await browser.newContext({
         viewport: { width: viewport.width, height: viewport.height },
+        reducedMotion: "reduce",
       });
       const page = await context.newPage();
 
@@ -379,6 +386,8 @@ async function run() {
 
         const swapContext = await browser.newContext({
           viewport: { width: viewport.width, height: viewport.height },
+          // Matches Phase 1 so the two measurements are comparable. See above.
+          reducedMotion: "reduce",
         });
         const swapPage = await swapContext.newPage();
         await swapPage.goto(BASE, { waitUntil: "networkidle" });

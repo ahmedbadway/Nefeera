@@ -22,7 +22,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 border-t border-gold/30 py-16 lg:grid-cols-12 lg:gap-16 lg:py-20">
           <div className="lg:col-span-5">
             <Logo variant="full" size="md" color="light" className="items-start" />
-            <p className="mt-7 max-w-sm text-[0.9375rem] leading-relaxed text-cream/65">
+            <p className="mt-7 max-w-sm text-[0.875rem] leading-relaxed text-cream/65">
               {footer.tagline}
             </p>
           </div>
@@ -34,7 +34,7 @@ export default function Footer() {
                   <li key={item.id}>
                     <a
                       href={item.href}
-                      className="text-[0.875rem] uppercase tracking-wide2 text-cream/70 transition-colors duration-200 hover:text-gold-soft"
+                      className="text-[0.75rem] uppercase tracking-wide2 text-cream/70 transition-colors duration-200 hover:text-gold-soft"
                     >
                       {item.label}
                     </a>
@@ -51,7 +51,7 @@ export default function Footer() {
                   href={contact.whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 text-[0.875rem] text-cream/70 transition-colors duration-200 hover:text-gold-soft"
+                  className="inline-flex items-center gap-3 text-[0.8125rem] text-cream/70 transition-colors duration-200 hover:text-gold-soft"
                 >
                   <WhatsAppIcon className="h-4 w-4 shrink-0" />
                   <span dir="ltr">{contact.whatsappDisplay}</span>
@@ -62,7 +62,7 @@ export default function Footer() {
                   href={contact.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 text-[0.875rem] text-cream/70 transition-colors duration-200 hover:text-gold-soft"
+                  className="inline-flex items-center gap-3 text-[0.8125rem] text-cream/70 transition-colors duration-200 hover:text-gold-soft"
                 >
                   <InstagramIcon className="h-4 w-4 shrink-0" />
                   <span dir="ltr">{contact.instagramHandle}</span>
