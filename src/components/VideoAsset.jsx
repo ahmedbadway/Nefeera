@@ -22,10 +22,12 @@ import { useMediaQuery } from "../utils/UseMediaQuery.js";
  * WHAT RENDERS WHEN:
  *   probe pending        -> shimmer placeholder (the same thing it becomes if
  *                           the files are missing, so there is no content flash)
- *   no video files       -> shimmer placeholder, no <video> in the DOM
- *   reduced motion       -> the poster still, or the placeholder if there is no
- *                           poster. Never a <video>, never a shimmer.
- *   video files present  -> <video> over the poster/placeholder
+ *   no video files       -> the poster if one exists, else the shimmer
+ *                           placeholder. No <video> in the DOM either way.
+ *   video files present  -> <video>, looping, with a pause control
+ *
+ * The film plays under prefers-reduced-motion too — see the note at the
+ * playback flags below for why, and what still respects the setting.
  *
  * @param {object} props
  * @param {string} props.desktopSrc  Landscape video path (768px and wider).
@@ -100,25 +102,24 @@ export default function VideoAsset({
   const videoAvailable = sources.length > 0 && !playbackFailed;
   const posterAvailable = Boolean(available?.poster) && !posterFailed;
 
-  // REDUCED MOTION MEANS NO MOVEMENT, NOT NO PICTURE.
-  // This used to drop the video entirely and fall back to the poster — which
-  // left anyone with reduced motion on staring at an empty cream panel whenever
-  // no poster had been uploaded. That is not a rare setting either: iOS turns
-  // Reduce Motion ON automatically in Low Power Mode, so a phone below 20%
-  // battery got the blank hero.
+  // The hero film loops wherever the browser allows it, including under
+  // prefers-reduced-motion. That is a deliberate client decision, taken with the
+  // trade-off understood: this is a decorative background rather than content,
+  // and a pause control is always available, which is what WCAG 2.2.2 actually
+  // asks for. Reduced motion still governs everything else on the page — the
+  // scroll reveals and the hero parallax both stay off.
   //
-  // Now the still comes from the poster when there is one, and otherwise from
-  // the video's own first frame, held paused. Motionless either way.
-  const showPoster = posterAvailable && (prefersReducedMotion || !videoAvailable);
-  const showVideo = videoAvailable && !showPoster;
-  const autoPlayVideo = showVideo && !prefersReducedMotion;
+  // Note this cannot force playback everywhere: iOS in Low Power Mode refuses
+  // autoplay outright, no matter the markup. That is exactly why the control
+  // below exists.
+  const showPoster = posterAvailable && !videoAvailable;
+  const showVideo = videoAvailable;
+  const autoPlayVideo = showVideo;
 
-  // Under reduced motion the file this slot is actually waiting for is the
-  // poster, not the video — so that is what the placeholder should ask for.
-  const specSource = prefersReducedMotion ? poster : isPhone ? mobileSrc : desktopSrc;
+  const specSource = isPhone ? mobileSrc : desktopSrc;
   const spec = getAssetSpec(specSource);
   const requirement = getAssetRequirementLabel(specSource);
-  const resolvedLabel = prefersReducedMotion ? "Hero poster" : label;
+  const resolvedLabel = label;
 
   const placeholderMarkup = useMemo(
     () =>
@@ -208,7 +209,9 @@ export default function VideoAsset({
           /* glass-dark, not glass: this control only ever appears when there is
              real footage behind it, and a light panel over dark video composites
              to a muddy grey that the icon then has to fight. */
-          className="glass-dark pressable absolute bottom-6 end-[var(--gutter)] z-10 inline-flex h-11 w-11 items-center justify-center rounded-full text-cream hover:text-gold-soft sm:bottom-8"
+          className={`glass-dark pressable absolute bottom-6 end-[var(--gutter)] z-10 inline-flex h-11 w-11 items-center justify-center rounded-full text-cream transition-opacity duration-500 ease-out-strong hover:text-gold-soft focus-visible:opacity-100 sm:bottom-8 ${
+            isPlaying ? "opacity-35 hover:opacity-100" : "opacity-100"
+          }`}
         >
           <span className="sr-only-focusable">
             {isPlaying ? content.hero.pauseVideo : content.hero.playVideo}
@@ -233,15 +236,16 @@ export default function VideoAsset({
 
       {showVideo ? (
         <video
-          key={`${autoPlayVideo}-${sources.map((source) => source.src).join("|")}`}
+          key={sources.map((source) => source.src).join("|")}
           className="absolute inset-0 h-full w-full object-cover"
           autoPlay={autoPlayVideo}
           muted
           loop={autoPlayVideo}
           playsInline
-          // Paused, we need the first frame actually painted rather than a blank
-          // box, so load enough to have one.
-          preload={autoPlayVideo ? "metadata" : "auto"}
+          // "auto" rather than "metadata": when a browser refuses autoplay the
+          // video sits paused, and a paused video with only metadata loaded can
+          // paint nothing at all. This guarantees there is a frame to show.
+          preload="auto"
           poster={available?.poster ? resolveAssetPath(poster) : undefined}
           ref={videoRef}
           aria-hidden="true"
@@ -260,14 +264,7 @@ export default function VideoAsset({
           {sources.map((source) => (
             <source
               key={source.src}
-              // The #t=0.1 media fragment tells the browser which frame to paint
-              // while paused. Without it Safari renders nothing until playback
-              // starts — which, for a video held paused, is never.
-              src={
-                autoPlayVideo
-                  ? resolveAssetPath(source.src)
-                  : `${resolveAssetPath(source.src)}#t=0.1`
-              }
+              src={resolveAssetPath(source.src)}
               type={source.type}
             />
           ))}
