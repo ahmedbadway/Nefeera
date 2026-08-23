@@ -10,8 +10,8 @@ import { WhatsAppIcon, ArrowIcon } from "./Icons.jsx";
  *
  * TWO DISTINCT LOOKS, NOT ONE LOOK WITH A HOLE IN IT:
  * With footage uploaded, this is a dark cinematic hero — video behind a layered
- * scrim, cream type on top. With no footage, the same section becomes a cream
- * editorial hero with charcoal type and a gold rule. The switch is driven by
+ * scrim, warm-white type on top. With no footage, the same section becomes a warm-white
+ * editorial hero with ink type and a gold rule. The switch is driven by
  * useHeroMedia() and transitioned rather than snapped.
  *
  * That is the whole point of the asset system: the missing state is designed,
@@ -26,7 +26,7 @@ export default function Hero() {
   const sectionRef = useRef(null);
 
   // hasDarkMedia, not hasVideo: under reduced motion the poster is what ends up
-  // behind this copy, so that is what decides whether cream type can be read.
+  // behind this copy, so that is what decides whether warm-white type can be read.
   // See utils/UseHeroMedia.js.
   const { hasDarkMedia } = useHeroMedia();
 
@@ -55,7 +55,7 @@ export default function Hero() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative isolate min-h-[100svh] overflow-hidden bg-cream"
+      className="relative isolate min-h-[100svh] overflow-hidden bg-sage-mist"
       aria-label={hero.headline}
     >
       {/* Media layer */}
@@ -84,7 +84,7 @@ export default function Hero() {
         />
       </motion.div>
 
-      {/* Scrim. Only meaningful over real footage — over the cream placeholder it
+      {/* Scrim. Only meaningful over real footage — over the warm-white placeholder it
           fades away so the panel keeps its warmth.
 
           Directional rather than flat: the copy sits at the inline start, so the
@@ -97,8 +97,8 @@ export default function Hero() {
           hasDarkMedia ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/75 via-charcoal/45 to-charcoal/15" />
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink/75 via-ink/45 to-ink/15" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent" />
       </div>
 
       {/* Content */}
@@ -109,7 +109,7 @@ export default function Hero() {
         <div className="max-w-3xl">
           <motion.p
             className={`eyebrow transition-colors duration-700 ${
-              hasDarkMedia ? "text-gold-soft" : "text-gold"
+              hasDarkMedia ? "text-champagne" : "text-sage-deep"
             }`}
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(12px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
@@ -119,8 +119,8 @@ export default function Hero() {
           </motion.p>
 
           <motion.h1
-            className={`mt-6 text-[clamp(1.875rem,5vw,3.375rem)] leading-[1.06] transition-colors duration-700 ${
-              hasDarkMedia ? "text-warm-white" : "text-charcoal"
+            className={`mt-6 text-[clamp(2.5rem,6.5vw,4.5rem)] leading-[1.05] transition-colors duration-700 ${
+              hasDarkMedia ? "text-warm-white" : "text-ink"
             }`}
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(18px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
@@ -131,7 +131,7 @@ export default function Hero() {
 
           <motion.p
             className={`mt-6 max-w-lg text-[0.9375rem] leading-[1.75] transition-colors duration-700 ${
-              hasDarkMedia ? "text-cream/85" : "text-charcoal-muted"
+              hasDarkMedia ? "text-warm-white/85" : "text-ink-muted"
             }`}
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(14px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
@@ -150,7 +150,7 @@ export default function Hero() {
               href={contact.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="pressable inline-flex items-center gap-2.5 bg-gold px-7 py-4 text-[0.8125rem] font-medium uppercase tracking-wide2 text-warm-white hover:bg-charcoal"
+              className="pressable inline-flex items-center gap-2.5 bg-ink px-7 py-4 text-[0.8125rem] font-medium uppercase tracking-wide2 text-warm-white hover:bg-ink"
             >
               <WhatsAppIcon className="h-4 w-4" />
               {hero.primaryCta}
@@ -160,8 +160,8 @@ export default function Hero() {
               href={hero.secondaryHref}
               className={`pressable group inline-flex items-center gap-2.5 border px-7 py-4 text-[0.8125rem] font-medium uppercase tracking-wide2 transition-colors duration-300 ${
                 hasDarkMedia
-                  ? "border-warm-white/50 text-warm-white hover:border-gold-soft hover:text-gold-soft"
-                  : "border-charcoal/25 text-charcoal hover:border-gold hover:text-gold"
+                  ? "border-warm-white/50 text-warm-white hover:border-champagne hover:text-champagne"
+                  : "border-ink/25 text-ink hover:border-sage-deep hover:text-sage-deep"
               }`}
             >
               {hero.secondaryCta}
@@ -176,7 +176,7 @@ export default function Hero() {
             width. */}
         <div
           className={`mt-14 hidden items-center justify-end gap-3 transition-colors duration-700 sm:flex ${
-            hasDarkMedia ? "text-cream/70" : "text-charcoal-muted"
+            hasDarkMedia ? "text-warm-white/70" : "text-ink-muted"
           }`}
         >
           <span className="text-[0.625rem] font-medium uppercase tracking-wide3">

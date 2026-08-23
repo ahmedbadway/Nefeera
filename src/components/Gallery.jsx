@@ -70,9 +70,9 @@ export default function Gallery() {
                       on a phone does not latch it on. */}
                   <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-[clamp(0.375rem,1vw,0.625rem)] flex items-center justify-center bg-charcoal/0 opacity-0 transition-all duration-500 ease-out-strong group-hover:bg-charcoal/25 group-hover:opacity-100 group-focus-visible:bg-charcoal/25 group-focus-visible:opacity-100"
+                    className="pointer-events-none absolute inset-[clamp(0.375rem,1vw,0.625rem)] flex items-center justify-center bg-ink/0 opacity-0 transition-all duration-500 ease-out-strong group-hover:bg-ink/25 group-hover:opacity-100 group-focus-visible:bg-ink/25 group-focus-visible:opacity-100"
                   >
-                    <span className="flex h-12 w-12 items-center justify-center border border-cream/70 text-cream">
+                    <span className="flex h-12 w-12 items-center justify-center border border-warm-white/70 text-warm-white">
                       <ExpandIcon className="h-5 w-5" />
                     </span>
                   </span>

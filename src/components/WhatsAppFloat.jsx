@@ -40,7 +40,7 @@ export default function WhatsAppFloat() {
           href={contact.whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="pressable float-elevation fixed bottom-5 end-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-gold text-warm-white hover:bg-charcoal sm:bottom-7 sm:end-7"
+          className="pressable float-elevation fixed bottom-5 end-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-sage-deep text-warm-white hover:bg-ink sm:bottom-7 sm:end-7"
           initial={
             prefersReducedMotion
               ? { opacity: 0 }

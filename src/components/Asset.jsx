@@ -83,7 +83,7 @@ export default function Asset({
 
   return (
     <div
-      className={`relative overflow-hidden bg-cream [&>div>svg]:block [&>div>svg]:h-full [&>div>svg]:w-full ${className}`}
+      className={`relative overflow-hidden bg-sage-mist [&>div>svg]:block [&>div>svg]:h-full [&>div>svg]:w-full ${className}`}
       style={{ aspectRatio: resolvedRatio }}
     >
       {/* Placeholder layer. Sits underneath and is revealed only when there is

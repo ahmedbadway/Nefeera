@@ -137,7 +137,7 @@ export default function VideoAsset({
         // No shimmer under reduced motion — that is movement too.
         animated: !prefersReducedMotion,
         idSeed: getAssetFilename(specSource) || "video",
-        // Full-bleed slots draw the cream field only. The artwork is cropped
+        // Full-bleed slots draw the warm-white field only. The artwork is cropped
         // unpredictably by `slice` at this size, so the label is rendered as
         // positioned HTML below instead. See PlaceholderSvg.js.
         showLockup: !fill,
@@ -160,7 +160,7 @@ export default function VideoAsset({
   const wrapperStyle = fill ? undefined : { aspectRatio: ratio || spec.ratio || "16/9" };
   const wrapperClass = `${
     fill ? "absolute" : "relative"
-  } inset-0 overflow-hidden bg-cream [&>div>svg]:block [&>div>svg]:h-full [&>div>svg]:w-full ${className}`;
+  } inset-0 overflow-hidden bg-sage-mist [&>div>svg]:block [&>div>svg]:h-full [&>div>svg]:w-full ${className}`;
 
   return (
     <div className={wrapperClass} style={wrapperStyle}>
@@ -181,12 +181,12 @@ export default function VideoAsset({
           the scroll hint is hidden on small screens. */}
       {fill && !mediaPresent ? (
         <div
-          className="pointer-events-none absolute bottom-6 end-[var(--gutter)] max-w-[min(18rem,68vw)] border border-gold/50 bg-warm-white/70 px-4 py-3 text-end backdrop-blur-[2px] sm:bottom-auto sm:top-28"
+          className="pointer-events-none absolute bottom-6 end-[var(--gutter)] max-w-[min(18rem,68vw)] border border-champagne-deep/50 bg-warm-white/70 px-4 py-3 text-end backdrop-blur-[2px] sm:bottom-auto sm:top-28"
           role="img"
           aria-label={`${resolvedLabel} placeholder. Required file: ${requirement}`}
         >
-          <p className="text-[0.6875rem] uppercase tracking-wide2 text-gold">{resolvedLabel}</p>
-          <p className="mt-1 text-[0.75rem] leading-snug text-charcoal-muted">{requirement}</p>
+          <p className="text-[0.6875rem] uppercase tracking-wide2 text-champagne-deep">{resolvedLabel}</p>
+          <p className="mt-1 text-[0.75rem] leading-snug text-ink-muted">{requirement}</p>
         </div>
       ) : null}
 
@@ -214,7 +214,7 @@ export default function VideoAsset({
           /* glass-dark, not glass: this control only ever appears when there is
              real footage behind it, and a light panel over dark video composites
              to a muddy grey that the icon then has to fight. */
-          className={`glass-dark pressable absolute bottom-6 end-[var(--gutter)] z-10 inline-flex h-11 w-11 items-center justify-center rounded-full text-cream transition-opacity duration-500 ease-out-strong hover:text-gold-soft focus-visible:opacity-100 sm:bottom-8 ${
+          className={`glass-dark pressable absolute bottom-6 end-[var(--gutter)] z-10 inline-flex h-11 w-11 items-center justify-center rounded-full text-warm-white transition-opacity duration-500 ease-out-strong hover:text-champagne focus-visible:opacity-100 sm:bottom-8 ${
             isPlaying ? "opacity-35 hover:opacity-100" : "opacity-100"
           }`}
         >
@@ -261,7 +261,7 @@ export default function VideoAsset({
             // The file is there but the browser will not play it — a missing
             // codec, a corrupt upload, a decode error. Fall back to the
             // placeholder and tell the parent, so a hero styled for dark video
-            // does not end up with cream type on a cream panel.
+            // does not end up with warm-white type on a warm-white panel.
             setPlaybackFailed(true);
             onPlaybackFailed?.(true);
           }}

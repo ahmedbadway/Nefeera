@@ -108,19 +108,19 @@ export function buildPlaceholderSvg({
   const markSvg = `
     <g transform="translate(${(cx - markWidth / 2).toFixed(2)} ${markTop.toFixed(2)}) scale(${(
     markWidth / 120
-  ).toFixed(4)})" fill="none" stroke="${tokens.gold}" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+  ).toFixed(4)})" fill="none" stroke="${tokens.champagneDeep}" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
       <path d="M12 18 C12 52, 30 66, 60 66 C90 66, 108 52, 108 18" stroke-width="5" />
       <path d="M108 18 C108 10, 102 5, 94 7" stroke-width="3.2" opacity="0.7" />
-      <circle cx="60" cy="6" r="4.5" fill="${tokens.gold}" stroke="none" />
+      <circle cx="60" cy="6" r="4.5" fill="${tokens.champagneDeep}" stroke="none" />
     </g>`;
 
   const shimmerSvg = animated
     ? `
     <defs>
       <linearGradient id="${shimmerId}" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="${tokens.gold}" stop-opacity="0" />
-        <stop offset="50%" stop-color="${tokens.gold}" stop-opacity="0.16" />
-        <stop offset="100%" stop-color="${tokens.gold}" stop-opacity="0" />
+        <stop offset="0%" stop-color="${tokens.champagne}" stop-opacity="0" />
+        <stop offset="50%" stop-color="${tokens.champagne}" stop-opacity="0.2" />
+        <stop offset="100%" stop-color="${tokens.champagne}" stop-opacity="0" />
       </linearGradient>
     </defs>
     <style>
@@ -145,12 +145,12 @@ export function buildPlaceholderSvg({
     inset * 2
   ).toFixed(2)}" height="${(h - inset * 2).toFixed(
     2
-  )}" fill="none" stroke="${tokens.gold}" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.55" />`;
+  )}" fill="none" stroke="${tokens.champagneDeep}" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.55" />`;
 
   // Field-only variant for full-bleed slots. Safe to crop from any edge.
   if (!showLockup) {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice" role="presentation" aria-hidden="true">
-  <rect width="${w}" height="${h}" fill="${tokens.cream}" />
+  <rect width="${w}" height="${h}" fill="${tokens.sageMist}" />
   ${shimmerSvg}
   ${frameSvg}
 </svg>`;
@@ -159,35 +159,35 @@ export function buildPlaceholderSvg({
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${escapeXml(
     label || "Placeholder"
   )} placeholder. Required file: ${escapeXml(requirement)}">
-  <rect width="${w}" height="${h}" fill="${tokens.cream}" />
+  <rect width="${w}" height="${h}" fill="${tokens.sageMist}" />
   ${shimmerSvg}
   ${frameSvg}
   ${markSvg}
   <text x="${cx.toFixed(2)}" y="${wordmarkY.toFixed(
     2
-  )}" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-size="${wordmarkSize.toFixed(
+  )}" text-anchor="middle" font-family="Italiana, Georgia, serif" font-size="${wordmarkSize.toFixed(
     2
   )}" letter-spacing="${(wordmarkSize * 0.18).toFixed(2)}" fill="${
-    tokens.charcoal
+    tokens.ink
   }" opacity="0.9">NEFEERA</text>
   <line x1="${(cx - ruleWidth / 2).toFixed(2)}" y1="${ruleY.toFixed(2)}" x2="${(
     cx +
     ruleWidth / 2
   ).toFixed(2)}" y2="${ruleY.toFixed(2)}" stroke="${
-    tokens.gold
+    tokens.champagneDeep
   }" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.7" />
   <text x="${cx.toFixed(2)}" y="${labelY.toFixed(
     2
-  )}" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="${labelSize.toFixed(
+  )}" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="${labelSize.toFixed(
     2
   )}" letter-spacing="${(labelSize * 0.1).toFixed(2)}" fill="${
-    tokens.charcoal
+    tokens.ink
   }">${escapeXml(label)}</text>
   <text x="${cx.toFixed(2)}" y="${requirementY.toFixed(
     2
-  )}" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="${requirementSize.toFixed(
+  )}" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="${requirementSize.toFixed(
     2
-  )}" fill="${tokens.charcoalMuted}">${escapeXml(requirement)}</text>
+  )}" fill="${tokens.inkMuted}">${escapeXml(requirement)}</text>
 </svg>`;
 }
 

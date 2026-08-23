@@ -72,19 +72,20 @@ const SIZES = {
 
 const COLORS = {
   dark: {
-    mark: "var(--color-gold)",
-    wordmark: "var(--color-charcoal)",
-    rule: "var(--color-gold)",
-    subline: "var(--color-charcoal)",
-    discipline: "var(--color-charcoal-muted)",
+    mark: "var(--color-champagne-deep)",
+    wordmark: "var(--color-ink)",
+    rule: "var(--color-champagne-deep)",
+    subline: "var(--color-ink)",
+    discipline: "var(--color-ink-muted)",
   },
   light: {
-    // Gold-soft rather than gold: the darker gold loses contrast over video.
-    mark: "var(--color-gold-soft)",
+    // Light champagne rather than the deep one: the darker champagne loses
+    // contrast over video.
+    mark: "var(--color-champagne)",
     wordmark: "var(--color-warm-white)",
-    rule: "var(--color-gold-soft)",
+    rule: "var(--color-champagne)",
     subline: "var(--color-warm-white)",
-    discipline: "var(--color-cream)",
+    discipline: "var(--color-sage-mist)",
   },
 };
 

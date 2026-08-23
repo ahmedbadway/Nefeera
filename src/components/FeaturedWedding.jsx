@@ -24,7 +24,7 @@ export default function FeaturedWedding() {
     <section
       id="featured"
       aria-labelledby="featured-heading"
-      className="relative bg-burgundy py-24 text-cream sm:py-32 lg:py-40"
+      className="relative bg-ink py-24 text-warm-white sm:py-32 lg:py-40"
     >
       <div className="shell">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-end">
@@ -40,18 +40,18 @@ export default function FeaturedWedding() {
           <div className="lg:col-span-4 lg:col-start-9">
             <Reveal delay={0.12}>
               {hasDetails ? (
-                <dl className="space-y-3 border-s border-gold-soft/35 ps-6">
+                <dl className="space-y-3 border-s border-champagne/35 ps-6">
                   {featured.details.map((detail) => (
                     <div key={detail.label}>
-                      <dt className="text-[0.6875rem] uppercase tracking-wide3 text-gold-soft">
+                      <dt className="text-[0.6875rem] uppercase tracking-wide3 text-champagne">
                         {detail.label}
                       </dt>
-                      <dd className="mt-1 text-[0.9375rem] text-cream/90">{detail.value}</dd>
+                      <dd className="mt-1 text-[0.9375rem] text-warm-white/90">{detail.value}</dd>
                     </div>
                   ))}
                 </dl>
               ) : (
-                <p className="border-s border-gold-soft/35 ps-6 text-[0.75rem] uppercase tracking-wide2 text-gold-soft/80">
+                <p className="border-s border-champagne/35 ps-6 text-[0.75rem] uppercase tracking-wide2 text-champagne/80">
                   {featured.detailsPending}
                 </p>
               )}
@@ -74,7 +74,7 @@ export default function FeaturedWedding() {
                 sizes="(max-width: 1024px) 100vw, 33vw"
                 className="glass-frame-dark w-full"
               />
-              <figcaption className="mt-3.5 text-[0.6875rem] uppercase tracking-wide2 text-cream/55">
+              <figcaption className="mt-3.5 text-[0.6875rem] uppercase tracking-wide2 text-warm-white/55">
                 {featured.captions[0]}
               </figcaption>
             </figure>
@@ -84,14 +84,14 @@ export default function FeaturedWedding() {
             <div className="space-y-5">
               {featured.body.map((paragraph, index) => (
                 <Reveal key={paragraph.slice(0, 32)} delay={index * 0.06}>
-                  <p className="text-[0.9375rem] leading-[1.8] text-cream/80">{paragraph}</p>
+                  <p className="text-[0.9375rem] leading-[1.8] text-warm-white/80">{paragraph}</p>
                 </Reveal>
               ))}
             </div>
 
             <Reveal delay={0.16}>
-              <blockquote className="mt-12 border-s-2 border-gold-soft ps-7">
-                <p className="font-display text-[clamp(1.125rem,2vw,1.5rem)] italic leading-[1.4] text-cream">
+              <blockquote className="mt-12 border-s-2 border-champagne ps-7">
+                <p className="font-display text-[clamp(1.125rem,2vw,1.5rem)] italic leading-[1.4] text-warm-white">
                   {featured.pullQuote}
                 </p>
               </blockquote>
@@ -112,7 +112,7 @@ export default function FeaturedWedding() {
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="glass-frame-dark w-full"
                 />
-                <figcaption className="mt-3.5 text-[0.6875rem] uppercase tracking-wide2 text-cream/55">
+                <figcaption className="mt-3.5 text-[0.6875rem] uppercase tracking-wide2 text-warm-white/55">
                   {featured.captions[caseIndex]}
                 </figcaption>
               </figure>

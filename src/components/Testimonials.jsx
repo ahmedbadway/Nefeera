@@ -27,7 +27,7 @@ export default function Testimonials() {
     <section
       id="testimonials"
       aria-labelledby="testimonials-heading"
-      className="relative bg-cream py-24 sm:py-32 lg:py-40"
+      className="relative bg-sage-mist py-24 sm:py-32 lg:py-40"
     >
       <div className="shell">
         <SectionHeading
@@ -50,14 +50,14 @@ export default function Testimonials() {
                   <div className="glass flex h-full min-h-[14rem] flex-col items-start justify-center border-dashed p-7">
                     <span
                       aria-hidden="true"
-                      className="font-display text-[2rem] leading-none text-gold/50"
+                      className="font-display text-[2rem] leading-none text-champagne-deep/50"
                     >
                       &ldquo;
                     </span>
-                    <p className="mt-4 text-[0.875rem] leading-relaxed text-charcoal-muted">
+                    <p className="mt-4 text-[0.875rem] leading-relaxed text-ink-muted">
                       {testimonials.pendingLabel}
                     </p>
-                    <p className="mt-3 text-[0.6875rem] uppercase tracking-wide2 text-gold">
+                    <p className="mt-3 text-[0.6875rem] uppercase tracking-wide2 text-champagne-deep">
                       {testimonials.pendingHint}
                     </p>
                   </div>
@@ -66,18 +66,18 @@ export default function Testimonials() {
                     <div>
                       <span
                         aria-hidden="true"
-                        className="font-display text-[2rem] leading-none text-gold/60"
+                        className="font-display text-[2rem] leading-none text-champagne-deep/60"
                       >
                         &ldquo;
                       </span>
                       <blockquote className="mt-4">
-                        <p className="font-display text-[1.0625rem] leading-[1.6] text-charcoal">
+                        <p className="font-display text-[1.0625rem] leading-[1.6] text-ink">
                           {item.quote}
                         </p>
                       </blockquote>
                     </div>
                     {item.attribution ? (
-                      <figcaption className="mt-7 text-[0.75rem] uppercase tracking-wide2 text-charcoal-muted">
+                      <figcaption className="mt-7 text-[0.75rem] uppercase tracking-wide2 text-ink-muted">
                         {item.attribution}
                       </figcaption>
                     ) : null}

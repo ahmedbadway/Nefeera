@@ -76,7 +76,7 @@ export default function Nav() {
 
   // At the top of the page the header sits on the hero. Cream type only works
   // there if there is real media behind it — with nothing uploaded the hero is a
-  // light cream panel, so the header has to stay charcoal or it disappears.
+  // light warm-white panel, so the header has to stay ink or it disappears.
   // See utils/UseHeroMedia.js.
   const { hasDarkMedia } = useHeroMedia();
   const lightType = !solid && hasDarkMedia;
@@ -86,7 +86,7 @@ export default function Nav() {
     <>
       <a
         href="#main"
-        className="sr-only-focusable fixed start-4 top-4 z-[60] rounded-sm bg-charcoal px-4 py-2 text-sm text-warm-white"
+        className="sr-only-focusable fixed start-4 top-4 z-[60] rounded-sm bg-ink px-4 py-2 text-sm text-warm-white"
       >
         {nav.skipToContent}
       </a>
@@ -114,7 +114,7 @@ export default function Nav() {
             aria-expanded={menuOpen}
             aria-controls="site-menu"
             className={`pressable -me-2 inline-flex h-11 w-11 items-center justify-center ${
-              lightType ? "text-warm-white" : "text-charcoal"
+              lightType ? "text-warm-white" : "text-ink"
             }`}
           >
             <span className="sr-only-focusable">{nav.openMenu}</span>
@@ -143,7 +143,7 @@ export default function Nav() {
                   ref={closeButtonRef}
                   type="button"
                   onClick={() => setMenuOpen(false)}
-                  className="pressable -me-2 inline-flex h-11 w-11 items-center justify-center text-charcoal"
+                  className="pressable -me-2 inline-flex h-11 w-11 items-center justify-center text-ink"
                 >
                   <span className="sr-only-focusable">{nav.closeMenu}</span>
                   <CloseIcon className="h-6 w-6" />
@@ -159,7 +159,7 @@ export default function Nav() {
                     key={item.id}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className="border-b border-gold/20 py-4 font-display text-[clamp(1.5rem,3vw,2.25rem)] text-charcoal transition-colors duration-200 hover:text-gold"
+                    className="border-b border-champagne/40 py-4 font-display text-[clamp(2rem,5vw,3.25rem)] text-ink transition-colors duration-200 hover:text-sage-deep"
                     style={{
                       // Short stagger so the list cascades in rather than
                       // appearing all at once. Decorative only — the links are
@@ -178,7 +178,7 @@ export default function Nav() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMenuOpen(false)}
-                  className="pressable mt-9 inline-flex items-center justify-center gap-2.5 bg-gold px-6 py-4 text-[0.6875rem] font-medium uppercase tracking-wide2 text-warm-white"
+                  className="pressable mt-9 inline-flex items-center justify-center gap-2.5 bg-ink px-6 py-4 text-[0.6875rem] font-medium uppercase tracking-wide2 text-warm-white"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
                   {nav.cta}

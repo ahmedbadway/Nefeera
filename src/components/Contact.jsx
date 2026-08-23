@@ -27,26 +27,26 @@ export default function Contact() {
     <section
       id="contact"
       aria-labelledby="contact-heading"
-      className="relative bg-charcoal py-24 text-cream sm:py-32 lg:py-40"
+      className="relative bg-ink py-24 text-warm-white sm:py-32 lg:py-40"
     >
       <div className="shell">
         <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
             <Reveal>
-              <p className="eyebrow text-gold-soft">{contact.eyebrow}</p>
+              <p className="eyebrow text-champagne">{contact.eyebrow}</p>
             </Reveal>
 
             <Reveal delay={0.06}>
               <h2
                 id="contact-heading"
-                className="mt-4 text-[clamp(1.625rem,3.6vw,2.5rem)] text-cream"
+                className="mt-4 text-[clamp(1.75rem,3.8vw,2.75rem)] text-warm-white"
               >
                 {contact.headline}
               </h2>
             </Reveal>
 
             <Reveal delay={0.12}>
-              <p className="mt-6 max-w-lg text-[0.9375rem] leading-[1.8] text-cream/75">
+              <p className="mt-6 max-w-lg text-[0.9375rem] leading-[1.8] text-warm-white/75">
                 {contact.body}
               </p>
             </Reveal>
@@ -56,7 +56,7 @@ export default function Contact() {
                 href={contact.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="pressable mt-10 inline-flex items-center gap-3 bg-gold px-8 py-[1.125rem] text-[0.8125rem] font-medium uppercase tracking-wide2 text-warm-white hover:bg-gold-soft hover:text-charcoal"
+                className="pressable mt-10 inline-flex items-center gap-3 bg-warm-white px-8 py-[1.125rem] text-[0.8125rem] font-medium uppercase tracking-wide2 text-ink hover:bg-champagne"
               >
                 <WhatsAppIcon className="h-[1.125rem] w-[1.125rem]" />
                 {contact.whatsappCta}
@@ -67,20 +67,20 @@ export default function Contact() {
           {/* Direct channels */}
           <div className="lg:col-span-4 lg:col-start-9">
             <Reveal delay={0.2}>
-              <h3 className="text-[0.6875rem] uppercase tracking-wide3 text-gold-soft">
+              <h3 className="text-[0.6875rem] uppercase tracking-wide3 text-champagne">
                 {contact.channelsLabel}
               </h3>
 
-              <ul className="mt-7 border-t border-cream/15">
+              <ul className="mt-7 border-t border-warm-white/15">
                 <li>
                   <a
                     href={contact.whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between gap-4 border-b border-cream/15 py-5 transition-colors duration-200 hover:text-gold-soft"
+                    className="group flex items-center justify-between gap-4 border-b border-warm-white/15 py-5 transition-colors duration-200 hover:text-champagne"
                   >
                     <span className="flex items-center gap-3.5">
-                      <WhatsAppIcon className="h-[1.125rem] w-[1.125rem] shrink-0 text-gold-soft" />
+                      <WhatsAppIcon className="h-[1.125rem] w-[1.125rem] shrink-0 text-champagne" />
                       <span className="text-[0.875rem]" dir="ltr">
                         {contact.whatsappDisplay}
                       </span>
@@ -94,10 +94,10 @@ export default function Contact() {
                     href={contact.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between gap-4 border-b border-cream/15 py-5 transition-colors duration-200 hover:text-gold-soft"
+                    className="group flex items-center justify-between gap-4 border-b border-warm-white/15 py-5 transition-colors duration-200 hover:text-champagne"
                   >
                     <span className="flex items-center gap-3.5">
-                      <InstagramIcon className="h-[1.125rem] w-[1.125rem] shrink-0 text-gold-soft" />
+                      <InstagramIcon className="h-[1.125rem] w-[1.125rem] shrink-0 text-champagne" />
                       <span className="text-[0.875rem]" dir="ltr">
                         {contact.instagramHandle}
                       </span>
@@ -110,10 +110,10 @@ export default function Contact() {
                   <li>
                     <a
                       href={`mailto:${contact.email}`}
-                      className="group flex items-center justify-between gap-4 border-b border-cream/15 py-5 transition-colors duration-200 hover:text-gold-soft"
+                      className="group flex items-center justify-between gap-4 border-b border-warm-white/15 py-5 transition-colors duration-200 hover:text-champagne"
                     >
                       <span className="flex items-center gap-3.5">
-                        <MailIcon className="h-[1.125rem] w-[1.125rem] shrink-0 text-gold-soft" />
+                        <MailIcon className="h-[1.125rem] w-[1.125rem] shrink-0 text-champagne" />
                         <span className="break-all text-[0.875rem]" dir="ltr">
                           {contact.email}
                         </span>

@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Gallery 01 placeholder. Required file: gallery-01.jpg — 1200×1600">
-  <rect width="1200" height="1600" fill="#EDE6DC" />
+  <rect width="1200" height="1600" fill="#E7EDE2" />
   
-  <rect x="24.00" y="24.00" width="1152.00" height="1552.00" fill="none" stroke="#B08D4F" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.55" />
+  <rect x="24.00" y="24.00" width="1152.00" height="1552.00" fill="none" stroke="#7A683F" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.55" />
   
-    <g transform="translate(456.00 506.00) scale(2.4000)" fill="none" stroke="#B08D4F" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+    <g transform="translate(456.00 506.00) scale(2.4000)" fill="none" stroke="#7A683F" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
       <path d="M12 18 C12 52, 30 66, 60 66 C90 66, 108 52, 108 18" stroke-width="5" />
       <path d="M108 18 C108 10, 102 5, 94 7" stroke-width="3.2" opacity="0.7" />
-      <circle cx="60" cy="6" r="4.5" fill="#B08D4F" stroke="none" />
+      <circle cx="60" cy="6" r="4.5" fill="#7A683F" stroke="none" />
     </g>
-  <text x="600.00" y="788.00" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-size="69.60" letter-spacing="12.53" fill="#2B2B2B" opacity="0.9">NEFEERA</text>
-  <line x1="420.00" y1="854.00" x2="780.00" y2="854.00" stroke="#B08D4F" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.7" />
-  <text x="600.00" y="956.00" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="52.80" letter-spacing="5.28" fill="#2B2B2B">Gallery 01</text>
-  <text x="600.00" y="1031.24" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="45.60" fill="#6B6560">gallery-01.jpg — 1200×1600</text>
+  <text x="600.00" y="788.00" text-anchor="middle" font-family="Italiana, Georgia, serif" font-size="69.60" letter-spacing="12.53" fill="#252E28" opacity="0.9">NEFEERA</text>
+  <line x1="420.00" y1="854.00" x2="780.00" y2="854.00" stroke="#7A683F" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.7" />
+  <text x="600.00" y="956.00" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="52.80" letter-spacing="5.28" fill="#252E28">Gallery 01</text>
+  <text x="600.00" y="1031.24" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="45.60" fill="#5A665C">gallery-01.jpg — 1200×1600</text>
 </svg>
