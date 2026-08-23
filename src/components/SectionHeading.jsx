@@ -37,7 +37,7 @@ export default function SectionHeading({
       <Reveal delay={0.06}>
         <h2
           id={id}
-          className={`mt-5 text-[clamp(2rem,5.2vw,3.5rem)] ${
+          className={`mt-4 text-[clamp(1.5rem,3.4vw,2.25rem)] ${
             inverted ? "text-cream" : "text-charcoal"
           }`}
         >
@@ -48,7 +48,7 @@ export default function SectionHeading({
       {body ? (
         <Reveal delay={0.12}>
           <p
-            className={`mt-6 max-w-xl text-[1.0625rem] leading-[1.75] ${
+            className={`mt-5 max-w-lg text-[0.9375rem] leading-[1.75] ${
               inverted ? "text-cream/80" : "text-charcoal-muted"
             }`}
           >

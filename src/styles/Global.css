@@ -92,6 +92,66 @@
   .float-elevation {
     box-shadow: 0 6px 24px -8px oklch(var(--charcoal) / 0.45);
   }
+
+  /* ---- Glass surfaces -------------------------------------------------
+     Translucent panels that let the page behind show through. Defined once
+     here rather than repeated as utility strings so the blur radius, the
+     saturation lift, and the unsupported-browser fallback stay consistent.
+
+     Blur is kept at 16px deliberately. Backdrop blur is one of the more
+     expensive things a browser can be asked to do, and the cost scales with
+     the radius and the area — a heavy blur across large panels is what makes
+     glass designs stutter on mid-range Android. */
+  .glass {
+    background-color: oklch(var(--warm-white) / 0.5);
+    border: 1px solid oklch(var(--gold) / 0.28);
+    backdrop-filter: blur(16px) saturate(1.15);
+    -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  }
+
+  .glass-dark {
+    background-color: oklch(var(--charcoal) / 0.28);
+    border: 1px solid oklch(var(--cream) / 0.16);
+    backdrop-filter: blur(16px) saturate(1.15);
+    -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  }
+
+  /* A translucent mount for photographs: the picture stays opaque, the frame
+     around it is what reads as glass. */
+  .glass-frame {
+    padding: clamp(0.375rem, 1vw, 0.625rem);
+    background-color: oklch(var(--warm-white) / 0.42);
+    border: 1px solid oklch(var(--gold) / 0.3);
+    backdrop-filter: blur(12px) saturate(1.1);
+    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  }
+
+  .glass-frame-dark {
+    padding: clamp(0.375rem, 1vw, 0.625rem);
+    background-color: oklch(var(--cream) / 0.1);
+    border: 1px solid oklch(var(--gold-soft) / 0.32);
+    backdrop-filter: blur(12px) saturate(1.1);
+    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  }
+
+  /* Without backdrop-filter there is no blur to separate text from whatever is
+     behind it, so the panels go nearly opaque instead. Legibility first. */
+  @supports not (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    .glass,
+    .glass-frame {
+      background-color: oklch(var(--warm-white) / 0.94);
+    }
+
+    .glass-dark {
+      background-color: oklch(var(--charcoal) / 0.86);
+    }
+
+    .glass-frame-dark {
+      background-color: oklch(var(--charcoal) / 0.55);
+    }
+  }
 }
 
 /* Mobile menu link cascade. A CSS keyframe rather than a Motion variant: this

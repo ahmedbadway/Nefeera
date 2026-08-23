@@ -88,7 +88,7 @@ export default function Nav() {
       <header
         className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,box-shadow] duration-500 ease-out-strong ${
           solid
-            ? "border-b border-gold/25 bg-warm-white/95 backdrop-blur-sm"
+            ? "glass border-x-0 border-t-0"
             : "border-b border-transparent bg-transparent"
         }`}
       >
@@ -98,7 +98,7 @@ export default function Nav() {
             className="pressable inline-flex shrink-0"
             aria-label={`${content.brand.name} — home`}
           >
-            <Logo variant="wordmark" size="sm" color={logoColor} />
+            <Logo variant="wordmark" size="xs" color={logoColor} />
           </a>
 
           <nav aria-label={nav.menuLabel} className="hidden items-center gap-9 lg:flex">
@@ -106,7 +106,7 @@ export default function Nav() {
               <a
                 key={item.id}
                 href={item.href}
-                className={`group relative py-1 text-[0.8125rem] font-medium uppercase tracking-wide2 transition-colors duration-200 ${
+                className={`group relative py-1 text-[0.6875rem] font-medium uppercase tracking-wide2 transition-colors duration-200 ${
                   lightType
                     ? "text-warm-white hover:text-gold-soft"
                     : "text-charcoal hover:text-gold"
@@ -124,7 +124,7 @@ export default function Nav() {
               href={contact.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`pressable inline-flex items-center gap-2 border px-5 py-2.5 text-[0.75rem] font-medium uppercase tracking-wide2 ${
+              className={`pressable inline-flex items-center gap-2 border px-5 py-2.5 text-[0.6875rem] font-medium uppercase tracking-wide2 ${
                 lightType
                   ? "border-warm-white/60 text-warm-white hover:border-gold-soft hover:text-gold-soft"
                   : "border-gold text-charcoal hover:bg-gold hover:text-warm-white"
@@ -158,7 +158,7 @@ export default function Nav() {
             role="dialog"
             aria-modal="true"
             aria-label={nav.menuLabel}
-            className="fixed inset-0 z-[55] bg-warm-white lg:hidden"
+            className="fixed inset-0 z-[55] bg-warm-white/85 backdrop-blur-2xl lg:hidden"
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(-8px)" }}
@@ -166,7 +166,7 @@ export default function Nav() {
           >
             <div className="shell flex h-full flex-col">
               <div className="flex items-center justify-between py-4">
-                <Logo variant="wordmark" size="sm" color="dark" />
+                <Logo variant="wordmark" size="xs" color="dark" />
                 <button
                   ref={closeButtonRef}
                   type="button"
@@ -187,7 +187,7 @@ export default function Nav() {
                     key={item.id}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className="border-b border-gold/20 py-5 font-display text-[2rem] text-charcoal transition-colors duration-200 hover:text-gold"
+                    className="border-b border-gold/20 py-4 font-display text-[1.5rem] text-charcoal transition-colors duration-200 hover:text-gold"
                     style={{
                       // Short stagger so the list cascades in rather than
                       // appearing all at once. Decorative only — the links are
@@ -206,7 +206,7 @@ export default function Nav() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMenuOpen(false)}
-                  className="pressable mt-9 inline-flex items-center justify-center gap-2.5 bg-gold px-6 py-4 text-[0.8125rem] font-medium uppercase tracking-wide2 text-warm-white"
+                  className="pressable mt-9 inline-flex items-center justify-center gap-2.5 bg-gold px-6 py-4 text-[0.6875rem] font-medium uppercase tracking-wide2 text-warm-white"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
                   {nav.cta}

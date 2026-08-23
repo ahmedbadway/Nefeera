@@ -112,7 +112,7 @@ export default function Hero() {
           </motion.p>
 
           <motion.h1
-            className={`mt-6 text-[clamp(2.5rem,7.4vw,5.25rem)] leading-[1.03] transition-colors duration-700 ${
+            className={`mt-6 text-[clamp(1.875rem,5vw,3.375rem)] leading-[1.06] transition-colors duration-700 ${
               hasDarkMedia ? "text-warm-white" : "text-charcoal"
             }`}
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(18px)" }}
@@ -123,7 +123,7 @@ export default function Hero() {
           </motion.h1>
 
           <motion.p
-            className={`mt-7 max-w-xl text-[1.0625rem] leading-[1.75] transition-colors duration-700 ${
+            className={`mt-6 max-w-lg text-[0.9375rem] leading-[1.75] transition-colors duration-700 ${
               hasDarkMedia ? "text-cream/85" : "text-charcoal-muted"
             }`}
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(14px)" }}

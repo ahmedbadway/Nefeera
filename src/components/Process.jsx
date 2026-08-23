@@ -42,7 +42,7 @@ export default function Process() {
               <div className="grid grid-cols-1 gap-4 py-10 sm:grid-cols-12 sm:gap-8 sm:py-12">
                 <div className="sm:col-span-2">
                   <span
-                    className="font-display text-[clamp(2.25rem,4vw,3rem)] leading-none text-gold"
+                    className="font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-none text-gold"
                     aria-hidden="true"
                   >
                     {step.number}
@@ -50,13 +50,13 @@ export default function Process() {
                 </div>
 
                 <div className="sm:col-span-4">
-                  <h3 className="text-[clamp(1.5rem,2.6vw,1.875rem)] text-charcoal">
+                  <h3 className="text-[clamp(1.0625rem,1.6vw,1.3125rem)] text-charcoal">
                     {step.title}
                   </h3>
                 </div>
 
                 <div className="sm:col-span-6">
-                  <p className="text-[1.0625rem] leading-[1.8] text-charcoal-muted">
+                  <p className="text-[0.9375rem] leading-[1.8] text-charcoal-muted">
                     {step.body}
                   </p>
                 </div>

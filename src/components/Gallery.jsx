@@ -50,7 +50,7 @@ export default function Gallery() {
                 <button
                   type="button"
                   onClick={() => setOpenIndex(index)}
-                  className="group relative block w-full overflow-hidden"
+                  className="glass-frame group relative block w-full"
                 >
                   <span className="sr-only-focusable">
                     {`${gallery.viewLabel} — ${spec.alt || label}`}
@@ -62,7 +62,7 @@ export default function Gallery() {
                     label={label}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     imgClassName="transition-transform duration-[900ms] ease-out-strong group-hover:scale-[1.04]"
-                    className="w-full"
+                    className="w-full overflow-hidden"
                   />
 
                   {/* Hover affordance. Gated to real pointers by the
@@ -70,7 +70,7 @@ export default function Gallery() {
                       on a phone does not latch it on. */}
                   <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 flex items-center justify-center bg-charcoal/0 opacity-0 transition-all duration-500 ease-out-strong group-hover:bg-charcoal/25 group-hover:opacity-100 group-focus-visible:bg-charcoal/25 group-focus-visible:opacity-100"
+                    className="pointer-events-none absolute inset-[clamp(0.375rem,1vw,0.625rem)] flex items-center justify-center bg-charcoal/0 opacity-0 transition-all duration-500 ease-out-strong group-hover:bg-charcoal/25 group-hover:opacity-100 group-focus-visible:bg-charcoal/25 group-focus-visible:opacity-100"
                   >
                     <span className="flex h-12 w-12 items-center justify-center border border-cream/70 text-cream">
                       <ExpandIcon className="h-5 w-5" />

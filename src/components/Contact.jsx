@@ -39,14 +39,14 @@ export default function Contact() {
             <Reveal delay={0.06}>
               <h2
                 id="contact-heading"
-                className="mt-5 text-[clamp(2.25rem,5.6vw,3.75rem)] text-cream"
+                className="mt-4 text-[clamp(1.625rem,3.6vw,2.5rem)] text-cream"
               >
                 {contact.headline}
               </h2>
             </Reveal>
 
             <Reveal delay={0.12}>
-              <p className="mt-7 max-w-xl text-[1.0625rem] leading-[1.8] text-cream/75">
+              <p className="mt-6 max-w-lg text-[0.9375rem] leading-[1.8] text-cream/75">
                 {contact.body}
               </p>
             </Reveal>
@@ -81,7 +81,7 @@ export default function Contact() {
                   >
                     <span className="flex items-center gap-3.5">
                       <WhatsAppIcon className="h-[1.125rem] w-[1.125rem] shrink-0 text-gold-soft" />
-                      <span className="text-[0.9375rem]" dir="ltr">
+                      <span className="text-[0.875rem]" dir="ltr">
                         {contact.whatsappDisplay}
                       </span>
                     </span>
@@ -98,7 +98,7 @@ export default function Contact() {
                   >
                     <span className="flex items-center gap-3.5">
                       <InstagramIcon className="h-[1.125rem] w-[1.125rem] shrink-0 text-gold-soft" />
-                      <span className="text-[0.9375rem]" dir="ltr">
+                      <span className="text-[0.875rem]" dir="ltr">
                         {contact.instagramHandle}
                       </span>
                     </span>
@@ -114,7 +114,7 @@ export default function Contact() {
                     >
                       <span className="flex items-center gap-3.5">
                         <MailIcon className="h-[1.125rem] w-[1.125rem] shrink-0 text-gold-soft" />
-                        <span className="break-all text-[0.9375rem]" dir="ltr">
+                        <span className="break-all text-[0.875rem]" dir="ltr">
                           {contact.email}
                         </span>
                       </span>

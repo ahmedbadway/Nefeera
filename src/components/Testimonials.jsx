@@ -47,14 +47,14 @@ export default function Testimonials() {
                 className={offsets[index % offsets.length]}
               >
                 {isPending ? (
-                  <div className="flex h-full min-h-[16rem] flex-col items-start justify-center border border-dashed border-gold/60 bg-warm-white/40 p-8">
+                  <div className="glass flex h-full min-h-[14rem] flex-col items-start justify-center border-dashed p-7">
                     <span
                       aria-hidden="true"
-                      className="font-display text-[2.5rem] leading-none text-gold/50"
+                      className="font-display text-[2rem] leading-none text-gold/50"
                     >
                       &ldquo;
                     </span>
-                    <p className="mt-4 text-[0.9375rem] leading-relaxed text-charcoal-muted">
+                    <p className="mt-4 text-[0.875rem] leading-relaxed text-charcoal-muted">
                       {testimonials.pendingLabel}
                     </p>
                     <p className="mt-3 text-[0.6875rem] uppercase tracking-wide2 text-gold">
@@ -62,16 +62,16 @@ export default function Testimonials() {
                     </p>
                   </div>
                 ) : (
-                  <figure className="flex h-full min-h-[16rem] flex-col justify-between border border-gold/30 bg-warm-white p-8">
+                  <figure className="glass flex h-full min-h-[14rem] flex-col justify-between p-7">
                     <div>
                       <span
                         aria-hidden="true"
-                        className="font-display text-[2.5rem] leading-none text-gold/60"
+                        className="font-display text-[2rem] leading-none text-gold/60"
                       >
                         &ldquo;
                       </span>
                       <blockquote className="mt-4">
-                        <p className="font-display text-[1.25rem] leading-[1.55] text-charcoal">
+                        <p className="font-display text-[1.0625rem] leading-[1.6] text-charcoal">
                           {item.quote}
                         </p>
                       </blockquote>

@@ -29,11 +29,21 @@ import { resolveAssetPath } from "../utils/ResolveAssetPath.js";
  * @param {object} props
  * @param {"full"|"wordmark"|"mark"} [props.variant] Which parts to show.
  * @param {"dark"|"light"} [props.color] "light" = cream, for use over the hero video.
- * @param {"sm"|"md"|"lg"} [props.size] Type scale of the lockup.
+ * @param {"xs"|"sm"|"md"|"lg"} [props.size] Type scale of the lockup.
  * @param {string} [props.className] Classes for the wrapper.
  */
 
 const SIZES = {
+  // Header size. Deliberately small: the lockup is four stacked lines, and at
+  // anything larger it dominates a transparent bar it is meant to sit lightly on.
+  xs: {
+    mark: "1.25rem",
+    wordmark: "0.8125rem",
+    rule: "2.25rem",
+    subline: "0.5625rem",
+    discipline: "0.5rem",
+    gap: "0.3125rem",
+  },
   sm: {
     mark: "1.6rem",
     wordmark: "1rem",

@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
+import { content } from "../data/Content.js";
+import { PlayIcon, PauseIcon } from "./Icons.jsx";
 import { getAssetSpec, getAssetRequirementLabel, getAssetFilename } from "../data/Content.js";
 import { buildPlaceholderSvg } from "../utils/PlaceholderSvg.js";
 import { probeAsset } from "../utils/AssetProbe.js";
@@ -56,6 +58,8 @@ export default function VideoAsset({
   const [available, setAvailable] = useState(null);
   const [playbackFailed, setPlaybackFailed] = useState(false);
   const [posterFailed, setPosterFailed] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -180,6 +184,43 @@ export default function VideoAsset({
         </div>
       ) : null}
 
+      {/* Play / pause control.
+          Two jobs at once. It satisfies WCAG 2.2.2, which wants a way to stop
+          anything that moves on its own for more than five seconds. And it is
+          the only way to start the film on a device that refuses to autoplay —
+          iOS in Low Power Mode blocks autoplay outright, no matter what the
+          markup says, so without this the video simply never moves there. */}
+      {fill && showVideo ? (
+        <button
+          type="button"
+          onClick={() => {
+            const video = videoRef.current;
+            if (!video) return;
+            if (video.paused) {
+              video.loop = true;
+              video.play().catch(() => {
+                // A refused play() is not a broken file — leave the frame up.
+              });
+            } else {
+              video.pause();
+            }
+          }}
+          /* glass-dark, not glass: this control only ever appears when there is
+             real footage behind it, and a light panel over dark video composites
+             to a muddy grey that the icon then has to fight. */
+          className="glass-dark pressable absolute bottom-6 end-[var(--gutter)] z-10 inline-flex h-11 w-11 items-center justify-center rounded-full text-cream hover:text-gold-soft sm:bottom-8"
+        >
+          <span className="sr-only-focusable">
+            {isPlaying ? content.hero.pauseVideo : content.hero.playVideo}
+          </span>
+          {isPlaying ? (
+            <PauseIcon className="h-4 w-4" />
+          ) : (
+            <PlayIcon className="h-4 w-4" />
+          )}
+        </button>
+      ) : null}
+
       {showPoster ? (
         <img
           src={resolveAssetPath(poster)}
@@ -202,8 +243,11 @@ export default function VideoAsset({
           // box, so load enough to have one.
           preload={autoPlayVideo ? "metadata" : "auto"}
           poster={available?.poster ? resolveAssetPath(poster) : undefined}
+          ref={videoRef}
           aria-hidden="true"
           tabIndex={-1}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
           onError={() => {
             // The file is there but the browser will not play it — a missing
             // codec, a corrupt upload, a decode error. Fall back to the
