@@ -477,19 +477,32 @@ async function run() {
     await scrollThrough(rmPage);
     await rmPage.waitForTimeout(700);
 
-    // Reduced motion means no MOVEMENT, not no picture: a video may be present
-    // so its first frame can stand in for a missing poster, but it must never
-    // autoplay or loop.
+    // The hero film is exempt from prefers-reduced-motion by client decision —
+    // it is a decorative background, and WCAG 2.2.2 asks for a way to stop it
+    // rather than for it never to start. So what has to hold here is that the
+    // control EXISTS, not that the video is stopped.
     const rmVideo = await rmPage.evaluate(() => {
       const videos = [...document.querySelectorAll("video")];
+      const control = document.querySelector("#hero button");
       return {
         count: videos.length,
-        autoplaying: videos.filter((v) => v.autoplay || v.loop || !v.paused).length,
+        hasPauseControl: Boolean(control),
+        controlLabel: control ? control.textContent.trim() : null,
       };
     });
     check(
-      rmVideo.autoplaying === 0,
-      `no autoplaying video under prefers-reduced-motion (${rmVideo.count} present, ${rmVideo.autoplaying} moving)`
+      rmVideo.count === 0 || rmVideo.hasPauseControl,
+      `hero film has a pause control whenever it is present (${rmVideo.count} video(s), control: ${rmVideo.controlLabel || "none"})`
+    );
+
+    // Everything else must still honour the setting.
+    const heroParallax = await rmPage.evaluate(() => {
+      const layer = document.querySelector("#hero > div");
+      return layer ? getComputedStyle(layer).transform : "none";
+    });
+    check(
+      heroParallax === "none",
+      `hero parallax disabled under reduced motion (transform: ${heroParallax})`
     );
 
     // Scroll reveals must not leave content invisible when motion is off.
