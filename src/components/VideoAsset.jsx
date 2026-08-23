@@ -30,14 +30,18 @@ import { useMediaQuery } from "../utils/UseMediaQuery.js";
  * playback flags below for why, and what still respects the setting.
  *
  * @param {object} props
- * @param {string} props.desktopSrc  Landscape video path (768px and wider).
- * @param {string} props.mobileSrc   Portrait video path (below 768px).
+ * @param {string} props.desktopSrc  Video path used at every width.
+ * @param {string} [props.mobileSrc]  Optional portrait cut for phones. Omit it
+ *   to serve the single `desktopSrc` file everywhere and adapt the framing with
+ *   `objectPositionClass` instead — that is what the hero does.
  * @param {string} props.webmSrc     WebM version, offered before the MP4.
  * @param {string} props.poster      Still image path, shown before playback.
  * @param {string} [props.label]     Placeholder label, e.g. "Hero video".
  * @param {string} [props.ratio]     Aspect-ratio box. Omit when `fill` is set.
  * @param {boolean} [props.fill]     Fill the nearest positioned parent instead of boxing itself.
  * @param {string} [props.className] Classes for the wrapper.
+ * @param {string} [props.objectPositionClass] Responsive object-position classes
+ *   applied to the video and poster, e.g. "object-[35%_15%] md:object-center".
  * @param {(failed: boolean) => void} [props.onPlaybackFailed]
  *   Called when a video file exists but will not play, so the surrounding
  *   layout can stop styling itself for dark media it is not actually getting.
@@ -51,6 +55,7 @@ export default function VideoAsset({
   ratio,
   fill = false,
   className = "",
+  objectPositionClass = "object-center",
   onPlaybackFailed,
 }) {
   const prefersReducedMotion = useReducedMotion();
@@ -116,7 +121,7 @@ export default function VideoAsset({
   const showVideo = videoAvailable;
   const autoPlayVideo = showVideo;
 
-  const specSource = isPhone ? mobileSrc : desktopSrc;
+  const specSource = (isPhone && mobileSrc) || desktopSrc;
   const spec = getAssetSpec(specSource);
   const requirement = getAssetRequirementLabel(specSource);
   const resolvedLabel = label;
@@ -229,7 +234,7 @@ export default function VideoAsset({
           src={resolveAssetPath(poster)}
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover"
+          className={`absolute inset-0 h-full w-full object-cover ${objectPositionClass}`}
           onError={() => setPosterFailed(true)}
         />
       ) : null}
@@ -237,7 +242,7 @@ export default function VideoAsset({
       {showVideo ? (
         <video
           key={sources.map((source) => source.src).join("|")}
-          className="absolute inset-0 h-full w-full object-cover"
+          className={`absolute inset-0 h-full w-full object-cover ${objectPositionClass}`}
           autoPlay={autoPlayVideo}
           muted
           loop={autoPlayVideo}
