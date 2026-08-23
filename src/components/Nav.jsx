@@ -9,9 +9,15 @@ import { MenuIcon, CloseIcon, WhatsAppIcon } from "./Icons.jsx";
  * Fixed header.
  *
  * Sits transparent over the hero video with the light logo, then picks up a
- * warm-white background and a gold hairline once you scroll past the hero.
- * The transition is opacity/background only — the header never moves, so it
- * cannot cause layout shift or jitter while scrolling.
+ * glass background and a gold hairline once you scroll past the hero. The
+ * transition is opacity/background only — the header never moves, so it cannot
+ * cause layout shift or jitter while scrolling.
+ *
+ * THERE IS NO LINK BAR, AT ANY WIDTH.
+ * Navigation lives entirely behind the menu button, so the header carries just
+ * the lockup and one control and stays out of the way of the film behind it.
+ * The panel it opens is the same one on a phone and on a desktop; only the
+ * type scale changes.
  *
  * Spacing uses logical properties throughout (ps/pe, ms/me, start/end) so the
  * planned Arabic RTL pass is a direction flip with no layout rewrite.
@@ -32,7 +38,7 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Lock the page behind the open mobile menu, and restore the scrollbar gutter
+  // Lock the page behind the open menu, and restore the scrollbar gutter
   // so the header does not jump sideways as the scrollbar disappears.
   useEffect(() => {
     if (!menuOpen) return undefined;
@@ -101,47 +107,13 @@ export default function Nav() {
             <Logo variant="wordmark" size="xs" color={logoColor} />
           </a>
 
-          <nav aria-label={nav.menuLabel} className="hidden items-center gap-9 lg:flex">
-            {nav.items.map((item) => (
-              <a
-                key={item.id}
-                href={item.href}
-                className={`group relative py-1 text-[0.6875rem] font-medium uppercase tracking-wide2 transition-colors duration-200 ${
-                  lightType
-                    ? "text-warm-white hover:text-gold-soft"
-                    : "text-charcoal hover:text-gold"
-                }`}
-              >
-                {item.label}
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-gold transition-transform duration-300 ease-out-strong group-hover:scale-x-100"
-                />
-              </a>
-            ))}
-
-            <a
-              href={contact.whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`pressable inline-flex items-center gap-2 border px-5 py-2.5 text-[0.6875rem] font-medium uppercase tracking-wide2 ${
-                lightType
-                  ? "border-warm-white/60 text-warm-white hover:border-gold-soft hover:text-gold-soft"
-                  : "border-gold text-charcoal hover:bg-gold hover:text-warm-white"
-              }`}
-            >
-              <WhatsAppIcon className="h-4 w-4" />
-              {nav.cta}
-            </a>
-          </nav>
-
           <button
             ref={menuButtonRef}
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            className={`pressable -me-2 inline-flex h-11 w-11 items-center justify-center lg:hidden ${
+            aria-controls="site-menu"
+            className={`pressable -me-2 inline-flex h-11 w-11 items-center justify-center ${
               lightType ? "text-warm-white" : "text-charcoal"
             }`}
           >
@@ -154,11 +126,11 @@ export default function Nav() {
       <AnimatePresence>
         {menuOpen ? (
           <motion.div
-            id="mobile-menu"
+            id="site-menu"
             role="dialog"
             aria-modal="true"
             aria-label={nav.menuLabel}
-            className="fixed inset-0 z-[55] bg-warm-white/85 backdrop-blur-2xl lg:hidden"
+            className="fixed inset-0 z-[55] bg-warm-white/85 backdrop-blur-2xl"
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, transform: "translateY(-8px)" }}
@@ -180,14 +152,14 @@ export default function Nav() {
 
               <nav
                 aria-label={nav.menuLabel}
-                className="flex flex-1 flex-col justify-center gap-1 pb-24"
+                className="flex w-full max-w-xl flex-1 flex-col justify-center gap-1 pb-24"
               >
                 {nav.items.map((item, index) => (
                   <a
                     key={item.id}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className="border-b border-gold/20 py-4 font-display text-[1.5rem] text-charcoal transition-colors duration-200 hover:text-gold"
+                    className="border-b border-gold/20 py-4 font-display text-[clamp(1.5rem,3vw,2.25rem)] text-charcoal transition-colors duration-200 hover:text-gold"
                     style={{
                       // Short stagger so the list cascades in rather than
                       // appearing all at once. Decorative only — the links are
