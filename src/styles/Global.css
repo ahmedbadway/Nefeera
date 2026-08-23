@@ -98,44 +98,98 @@
   }
 
   /* ---- Glass surfaces -------------------------------------------------
-     Translucent panels that let the page behind show through. Defined once
-     here rather than repeated as utility strings so the blur radius, the
-     saturation lift, and the unsupported-browser fallback stay consistent.
+     Translucent panels floating over the fixed video backdrop. Defined once
+     here rather than repeated as utility strings so the fills, hairlines,
+     blur radii, and the fallbacks can never drift between sections.
 
-     Blur is kept at 16px deliberately. Backdrop blur is one of the more
-     expensive things a browser can be asked to do, and the cost scales with
-     the radius and the area — a heavy blur across large panels is what makes
-     glass designs stutter on mid-range Android. */
+     PERFORMANCE RULES (every panel here blurs a PLAYING VIDEO):
+     - Blur radii come from --glass-blur / --glass-blur-frame in Theme.css,
+       capped at 20px desktop and dropped to 10px/8px on phones. Cost scales
+       with radius × area.
+     - NEVER nest one backdrop-filter element inside another. A shell that
+       sits inside a .glass panel uses a plain translucent background
+       (e.g. bg-warm-white/40) with no filter — the panel already blurred.
+     - No glass on elements smaller than ~44px, except the floating controls
+       (nav pill, pause button, WhatsApp float, lightbox chrome).
+     - The video veil in FixedVideoBackdrop is a plain background-color,
+       never a filter.
+
+     CONTRAST FLOORS (load-bearing — do not lower):
+     - .glass fill 0.62 + the 0.32 veil keeps ink-muted text ≥4.6:1 even
+       over pure-black footage.
+     - .glass-dark fill 0.82 keeps warm-white text ≥4.7:1 even over
+       pure-white footage.
+
+     Radius policy lives at the call sites: cards rounded-2xl/rounded-3xl
+     (never above 24px), pills rounded-full. */
   .glass {
-    background-color: oklch(var(--warm-white) / 0.5);
-    border: 1px solid oklch(var(--champagne) / 0.4);
-    backdrop-filter: blur(16px) saturate(1.15);
-    -webkit-backdrop-filter: blur(16px) saturate(1.15);
+    background-color: oklch(var(--warm-white) / 0.62);
+    border: 1px solid oklch(var(--warm-white) / 0.55);
+    box-shadow:
+      inset 0 1px 0 oklch(var(--warm-white) / 0.7),
+      0 18px 50px -24px oklch(var(--ink) / 0.35);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
   }
 
+  /* Decorative glass — lighter and more see-through than .glass. For panels
+     that carry little or no body text (empty testimonial cards). */
+  .glass-soft {
+    background-color: oklch(var(--warm-white) / 0.38);
+    border: 1px solid oklch(var(--warm-white) / 0.45);
+    box-shadow:
+      inset 0 1px 0 oklch(var(--warm-white) / 0.55),
+      0 14px 40px -22px oklch(var(--ink) / 0.3);
+    backdrop-filter: blur(var(--glass-blur-frame)) saturate(1.25);
+    -webkit-backdrop-filter: blur(var(--glass-blur-frame)) saturate(1.25);
+  }
+
+  /* Dark panel — Contact and Footer. */
   .glass-dark {
-    background-color: oklch(var(--ink) / 0.28);
-    border: 1px solid oklch(var(--warm-white) / 0.16);
-    backdrop-filter: blur(16px) saturate(1.15);
-    -webkit-backdrop-filter: blur(16px) saturate(1.15);
+    background-color: oklch(var(--ink) / 0.82);
+    border: 1px solid oklch(var(--warm-white) / 0.14);
+    box-shadow: inset 0 1px 0 oklch(var(--warm-white) / 0.16);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
   }
 
-  /* A translucent mount for photographs: the picture stays opaque, the frame
-     around it is what reads as glass. */
+  /* Photo mount: the picture stays opaque, the frame around it reads as
+     glass. This is the OUTER shell of the double-bezel — the image inside
+     takes a concentric smaller radius and NO blur of its own. */
   .glass-frame {
     padding: clamp(0.375rem, 1vw, 0.625rem);
     background-color: oklch(var(--warm-white) / 0.42);
-    border: 1px solid oklch(var(--champagne) / 0.42);
-    backdrop-filter: blur(12px) saturate(1.1);
-    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+    border: 1px solid oklch(var(--warm-white) / 0.55);
+    box-shadow: inset 0 1px 0 oklch(var(--warm-white) / 0.6);
+    backdrop-filter: blur(var(--glass-blur-frame)) saturate(1.2);
+    -webkit-backdrop-filter: blur(var(--glass-blur-frame)) saturate(1.2);
   }
 
   .glass-frame-dark {
     padding: clamp(0.375rem, 1vw, 0.625rem);
     background-color: oklch(var(--warm-white) / 0.1);
     border: 1px solid oklch(var(--champagne) / 0.32);
-    backdrop-filter: blur(12px) saturate(1.1);
-    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+    backdrop-filter: blur(var(--glass-blur-frame)) saturate(1.1);
+    -webkit-backdrop-filter: blur(var(--glass-blur-frame)) saturate(1.1);
+  }
+
+  /* Floating pill chrome — the nav pill and the round floating controls. */
+  .glass-pill {
+    background-color: oklch(var(--warm-white) / 0.5);
+    border: 1px solid oklch(var(--warm-white) / 0.6);
+    box-shadow:
+      inset 0 1px 0 oklch(var(--warm-white) / 0.65),
+      0 10px 30px -14px oklch(var(--ink) / 0.35);
+    backdrop-filter: blur(var(--glass-blur-frame)) saturate(1.3);
+    -webkit-backdrop-filter: blur(var(--glass-blur-frame)) saturate(1.3);
+  }
+
+  .glass-pill-dark {
+    background-color: oklch(var(--ink) / 0.5);
+    border: 1px solid oklch(var(--warm-white) / 0.25);
+    box-shadow: inset 0 1px 0 oklch(var(--warm-white) / 0.2);
+    backdrop-filter: blur(var(--glass-blur-frame)) saturate(1.2);
+    -webkit-backdrop-filter: blur(var(--glass-blur-frame)) saturate(1.2);
   }
 
   /* Without backdrop-filter there is no blur to separate text from whatever is
@@ -144,17 +198,51 @@
     (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
   ) {
     .glass,
-    .glass-frame {
-      background-color: oklch(var(--warm-white) / 0.94);
+    .glass-soft,
+    .glass-frame,
+    .glass-pill {
+      background-color: oklch(var(--warm-white) / 0.95);
     }
 
-    .glass-dark {
-      background-color: oklch(var(--ink) / 0.86);
+    .glass-dark,
+    .glass-pill-dark {
+      background-color: oklch(var(--ink) / 0.94);
     }
 
     .glass-frame-dark {
       background-color: oklch(var(--ink) / 0.55);
     }
+  }
+}
+
+/* Users who ask the OS for reduced transparency get near-opaque panels and no
+   blur at all. This sits on top of the @supports fallback above, not instead
+   of it — support for the media query itself is still uneven. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --backdrop-veil: 0.9;
+  }
+
+  .glass,
+  .glass-soft,
+  .glass-frame,
+  .glass-pill {
+    background-color: oklch(var(--warm-white) / 0.95);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .glass-dark,
+  .glass-pill-dark {
+    background-color: oklch(var(--ink) / 0.94);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .glass-frame-dark {
+    background-color: oklch(var(--ink) / 0.55);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
 
