@@ -59,8 +59,6 @@ const arabic = {
     secondaryCta: "شاهد الأعمال",
     secondaryHref: "#gallery",
     scrollHint: "انزل",
-    playVideo: "تشغيل الفيلم الخلفي",
-    pauseVideo: "إيقاف الفيلم الخلفي",
   },
 
   about: {
