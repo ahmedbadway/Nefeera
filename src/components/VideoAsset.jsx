@@ -9,6 +9,10 @@ import { useMediaQuery } from "../utils/UseMediaQuery.js";
 // The gestures that lift iOS's Low Power Mode autoplay block.
 const GESTURES = ["pointerdown", "touchstart", "keydown", "scroll"];
 
+// How many times a media error is retried before the slot admits defeat and
+// falls back to the placeholder.
+const MAX_MEDIA_RETRIES = 2;
+
 /**
  * A swappable background-video slot, used for the hero.
  *
@@ -69,6 +73,7 @@ export default function VideoAsset({
   const [available, setAvailable] = useState(null);
   const [playbackFailed, setPlaybackFailed] = useState(false);
   const [posterFailed, setPosterFailed] = useState(false);
+  const errorCount = useRef(0);
   const fallbackVideoRef = useRef(null);
   const resolvedVideoRef = videoRef || fallbackVideoRef;
 
@@ -132,10 +137,11 @@ export default function VideoAsset({
   //     is stamped on imperatively before play() is attempted.
   //  2. iOS in Low Power Mode refuses autoplay outright, no matter the markup.
   //     Nothing can override that, but the refusal is lifted by the visitor's
-  //     first real gesture — so the first tap, click, or scroll anywhere on
-  //     the page retries playback, once, and then unbinds itself.
-  //  3. Returning to a backgrounded tab can leave the element paused, so
-  //     visibility changes retry too.
+  //     first real gesture — so every tap, click, keypress, or scroll retries
+  //     playback until one actually succeeds.
+  //  3. Returning to a backgrounded tab can leave the element paused, and a
+  //     file that arrives late can miss its own autoplay window, so visibility
+  //     changes and readiness events retry too.
   useEffect(() => {
     const video = resolvedVideoRef.current;
     if (!video || !showVideo) return undefined;
@@ -146,33 +152,79 @@ export default function VideoAsset({
 
     if (!autoPlayVideo) return undefined;
 
+    let unbound = false;
+    const unbind = () => {
+      if (unbound) return;
+      unbound = true;
+      GESTURES.forEach((type) => window.removeEventListener(type, onGesture));
+    };
+
+    // Only stop listening once a play() actually RESOLVES. play() is async, so
+    // unbinding right after calling it — which is what this did at first —
+    // threw away every remaining chance the moment one attempt was refused,
+    // and a refused first attempt is the normal case on iOS.
     const attemptPlay = () => {
-      if (video.paused) {
-        video.play().catch(() => {
-          // Still refused. The next gesture gets another turn.
+      if (!video.paused) return;
+      const started = video.play();
+      if (started && typeof started.then === "function") {
+        started.then(unbind).catch(() => {
+          // Refused. Keep listening; the next gesture gets another turn.
         });
       }
     };
 
+    function onGesture() {
+      attemptPlay();
+    }
+
     attemptPlay();
 
-    const onFirstGesture = () => {
-      attemptPlay();
-      // One retry per gesture type is enough; a film that could not start on
-      // a real tap is not going to start on the tenth.
-      GESTURES.forEach((type) => window.removeEventListener(type, onFirstGesture));
-    };
-
     GESTURES.forEach((type) =>
-      window.addEventListener(type, onFirstGesture, { once: false, passive: true })
+      window.addEventListener(type, onGesture, { passive: true })
     );
     document.addEventListener("visibilitychange", attemptPlay);
+    // A file that arrives slowly is ready long after mount, and on a phone
+    // connection that gap is where autoplay quietly gets skipped.
+    video.addEventListener("canplay", attemptPlay);
+    video.addEventListener("loadeddata", attemptPlay);
 
     return () => {
-      GESTURES.forEach((type) => window.removeEventListener(type, onFirstGesture));
+      unbind();
       document.removeEventListener("visibilitychange", attemptPlay);
+      video.removeEventListener("canplay", attemptPlay);
+      video.removeEventListener("loadeddata", attemptPlay);
     };
   }, [showVideo, autoPlayVideo, resolvedVideoRef, sources]);
+
+  // GIVING UP IS A LAST RESORT, NOT A FIRST RESPONSE.
+  //
+  // This used to retire the video permanently on the first error event, which
+  // was survivable while a play button existed to bring it back. It is not
+  // survivable now. And a media error is very often transient — a stalled
+  // segment on a phone connection, a dropped request mid-download — rather
+  // than the codec problem the handler assumed. So a failure reloads the
+  // element and tries again, and only a run of them falls back to the
+  // placeholder, which is the state that also tells the parent to restyle.
+  const handleMediaError = () => {
+    const video = resolvedVideoRef.current;
+    const attempts = errorCount.current + 1;
+    errorCount.current = attempts;
+
+    if (attempts <= MAX_MEDIA_RETRIES && video) {
+      // load() restarts resource selection from the top of the source list.
+      window.setTimeout(() => {
+        try {
+          video.load();
+        } catch {
+          // The element went away between the failure and this retry.
+        }
+      }, attempts * 400);
+      return;
+    }
+
+    setPlaybackFailed(true);
+    onPlaybackFailed?.(true);
+  };
 
   const specSource = (isPhone && mobileSrc) || desktopSrc;
   const spec = getAssetSpec(specSource);
@@ -270,14 +322,7 @@ export default function VideoAsset({
           aria-hidden="true"
           tabIndex={-1}
 
-          onError={() => {
-            // The file is there but the browser will not play it — a missing
-            // codec, a corrupt upload, a decode error. Fall back to the
-            // placeholder and tell the parent, so a hero styled for dark video
-            // does not end up with warm-white type on a warm-white panel.
-            setPlaybackFailed(true);
-            onPlaybackFailed?.(true);
-          }}
+          onError={handleMediaError}
         >
           {sources.map((source) => (
             <source
