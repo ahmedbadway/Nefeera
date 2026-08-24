@@ -4,8 +4,8 @@ import { content as english } from "./Content.js";
  * ARABIC COPY.
  *
  * This file holds ONLY the words. Everything structural — asset paths,
- * assetSpecs, the WhatsApp number and its URL, the Instagram handle — is
- * inherited from Content.js at the bottom of this file, because none of it is
+ * assetSpecs, the WhatsApp number, the Instagram handle — is inherited from
+ * Content.js at the bottom of this file, because none of it is
  * language-dependent and two copies of a phone number is how a phone number
  * goes stale.
  *
@@ -168,9 +168,6 @@ const arabic = {
     whatsappCta: "راسلنا على واتساب",
     whatsappFloatLabel: "راسل نفيرة على واتساب",
 
-    instagramCta: "شاهد المزيد على إنستغرام",
-    emailCta: "أرسل بريدًا إلكترونيًا",
-
     channelsLabel: "قنوات مباشرة",
   },
 
@@ -186,9 +183,12 @@ const arabic = {
  * The exported object: Arabic words over the English structure.
  *
  * The spreads are shallow per section on purpose. `contact` in particular
- * MUST inherit the English entry's `whatsapp`, `whatsappUrl`, `instagram`,
- * `instagramHandle`, and `email` — those are identifiers, not copy, and the
- * WhatsApp URL carries its own prefilled Arabic-agnostic message.
+ * MUST inherit the English entry's `whatsapp`, `instagram`, `instagramHandle`,
+ * and `email` — those are identifiers, not copy.
+ *
+ * The WhatsApp link is the one exception: it is rebuilt below so an Arabic
+ * visitor's message arrives already written in Arabic. Same number, same
+ * source of truth, different opener.
  */
 export const content = {
   ...english,
@@ -201,7 +201,13 @@ export const content = {
   process: arabic.process,
   gallery: arabic.gallery,
   testimonials: arabic.testimonials,
-  contact: { ...english.contact, ...arabic.contact },
+  contact: {
+    ...english.contact,
+    ...arabic.contact,
+    whatsappUrl: `https://wa.me/${english.contact.whatsapp}?text=${encodeURIComponent(
+      "أهلًا نفيرة، حابب أتكلم معاكم عن تنسيق فرحي."
+    )}`,
+  },
   footer: arabic.footer,
   // assets and everything else fall through from the English object.
 };

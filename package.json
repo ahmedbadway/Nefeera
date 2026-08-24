@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "placeholders": "node scripts/GeneratePlaceholders.mjs",
     "assets:readme": "node scripts/GenerateAssetReadme.mjs",
-    "assets": "npm run placeholders && npm run assets:readme"
+    "assets": "npm run placeholders && npm run assets:readme",
+    "verify:assets": "node scripts/VerifyAssets.mjs"
   },
   "dependencies": {
     "motion": "^11.15.0",
