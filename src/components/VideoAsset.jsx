@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
-import { useContent } from "../utils/UseLanguage.js";
-import { PlayIcon, PauseIcon } from "./Icons.jsx";
 import { getAssetSpec, getAssetRequirementLabel, getAssetFilename } from "../data/Content.js";
 import { buildPlaceholderSvg } from "../utils/PlaceholderSvg.js";
 import { probeAsset } from "../utils/AssetProbe.js";
 import { resolveAssetPath } from "../utils/ResolveAssetPath.js";
 import { useMediaQuery } from "../utils/UseMediaQuery.js";
+
+// The gestures that lift iOS's Low Power Mode autoplay block.
+const GESTURES = ["pointerdown", "touchstart", "keydown", "scroll"];
 
 /**
  * A swappable background-video slot, used for the hero.
@@ -24,10 +25,10 @@ import { useMediaQuery } from "../utils/UseMediaQuery.js";
  *                           the files are missing, so there is no content flash)
  *   no video files       -> the poster if one exists, else the shimmer
  *                           placeholder. No <video> in the DOM either way.
- *   video files present  -> <video>, looping, with a pause control
+ *   video files present  -> <video>, looping continuously
  *
- * The film plays under prefers-reduced-motion too — see the note at the
- * playback flags below for why, and what still respects the setting.
+ * The film loops with no on-screen control at all — see the playback notes
+ * below for how that is held up on iOS, and what prefers-reduced-motion does.
  *
  * @param {object} props
  * @param {string} props.desktopSrc  Video path used at every width.
@@ -45,13 +46,8 @@ import { useMediaQuery } from "../utils/UseMediaQuery.js";
  * @param {(failed: boolean) => void} [props.onPlaybackFailed]
  *   Called when a video file exists but will not play, so the surrounding
  *   layout can stop styling itself for dark media it is not actually getting.
- * @param {boolean} [props.hideControl] Suppress the built-in play/pause button.
- *   Set by FixedVideoBackdrop, which renders its own control OUTSIDE the
- *   aria-hidden media layer — the WCAG 2.2.2 obligation moves with it.
  * @param {React.RefObject} [props.videoRef] External ref attached to the
- *   <video> element, so a parent that hid the control can drive playback.
- * @param {(isPlaying: boolean) => void} [props.onPlayStateChange] Play/pause
- *   notifications for the same external control.
+ *   <video> element, for a parent that needs to inspect playback.
  */
 export default function VideoAsset({
   desktopSrc,
@@ -64,11 +60,8 @@ export default function VideoAsset({
   className = "",
   objectPositionClass = "object-center",
   onPlaybackFailed,
-  hideControl = false,
   videoRef = null,
-  onPlayStateChange,
 }) {
-  const content = useContent();
   const prefersReducedMotion = useReducedMotion();
   const isPhone = useMediaQuery("(max-width: 767px)");
 
@@ -76,7 +69,6 @@ export default function VideoAsset({
   const [available, setAvailable] = useState(null);
   const [playbackFailed, setPlaybackFailed] = useState(false);
   const [posterFailed, setPosterFailed] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const fallbackVideoRef = useRef(null);
   const resolvedVideoRef = videoRef || fallbackVideoRef;
 
@@ -119,40 +111,67 @@ export default function VideoAsset({
   const videoAvailable = sources.length > 0 && !playbackFailed;
   const posterAvailable = Boolean(available?.poster) && !posterFailed;
 
-  // The film does NOT autoplay under prefers-reduced-motion. (This reverses an
-  // earlier deliberate decision to loop regardless — with the film now behind
-  // the ENTIRE page rather than one hero, a permanently moving background is
-  // exactly what that setting exists to refuse.) The video still mounts,
-  // paused, with preload="auto" so a first frame paints, and the play control
-  // remains available for visitors who want the film anyway.
-  //
-  // Autoplay also cannot be forced everywhere: iOS in Low Power Mode refuses
-  // it outright, no matter the markup. That is the other reason the control
-  // exists.
+  // The film loops continuously, with one exception: prefers-reduced-motion.
+  // A visitor who has asked their OS to stop moving interfaces is not asking
+  // about this site in particular, and a film running behind every section is
+  // precisely what that setting exists to refuse. They get a still first frame
+  // instead. That is also what keeps WCAG 2.2.2 satisfied now that there is no
+  // pause button: the mechanism to stop the motion is the OS preference.
   const showPoster = posterAvailable && !videoAvailable;
   const showVideo = videoAvailable;
   const autoPlayVideo = showVideo && !prefersReducedMotion;
 
-  // iOS SAFARI AUTOPLAY FIX. React sets `muted` as a DOM property only and
-  // never renders the attribute into the markup — but iOS decides whether a
-  // video may autoplay by looking for the ATTRIBUTE on the element. Without
-  // it, iPhones sit on a black frame forever. So the attribute is stamped on
-  // imperatively, and play() is retried once for the devices that already
-  // refused before the attribute existed.
+  // KEEPING IT PLAYING, EVERYWHERE.
+  //
+  // Three separate things stop a background film, and there is no button to
+  // fall back on any more, so each one is handled:
+  //
+  //  1. iOS reads the `muted` ATTRIBUTE to decide whether autoplay is allowed,
+  //     and React only ever sets the property — the attribute never reaches
+  //     the markup. Without it an iPhone sits on a black frame forever, so it
+  //     is stamped on imperatively before play() is attempted.
+  //  2. iOS in Low Power Mode refuses autoplay outright, no matter the markup.
+  //     Nothing can override that, but the refusal is lifted by the visitor's
+  //     first real gesture — so the first tap, click, or scroll anywhere on
+  //     the page retries playback, once, and then unbinds itself.
+  //  3. Returning to a backgrounded tab can leave the element paused, so
+  //     visibility changes retry too.
   useEffect(() => {
     const video = resolvedVideoRef.current;
-    if (!video || !showVideo) return;
+    if (!video || !showVideo) return undefined;
 
     video.muted = true;
     video.defaultMuted = true;
     video.setAttribute("muted", "");
 
-    if (autoPlayVideo && video.paused) {
-      video.play().catch(() => {
-        // Still refused (Low Power Mode, data saver): the play control is the
-        // designed path in, not an error.
-      });
-    }
+    if (!autoPlayVideo) return undefined;
+
+    const attemptPlay = () => {
+      if (video.paused) {
+        video.play().catch(() => {
+          // Still refused. The next gesture gets another turn.
+        });
+      }
+    };
+
+    attemptPlay();
+
+    const onFirstGesture = () => {
+      attemptPlay();
+      // One retry per gesture type is enough; a film that could not start on
+      // a real tap is not going to start on the tenth.
+      GESTURES.forEach((type) => window.removeEventListener(type, onFirstGesture));
+    };
+
+    GESTURES.forEach((type) =>
+      window.addEventListener(type, onFirstGesture, { once: false, passive: true })
+    );
+    document.addEventListener("visibilitychange", attemptPlay);
+
+    return () => {
+      GESTURES.forEach((type) => window.removeEventListener(type, onFirstGesture));
+      document.removeEventListener("visibilitychange", attemptPlay);
+    };
   }, [showVideo, autoPlayVideo, resolvedVideoRef, sources]);
 
   const specSource = (isPhone && mobileSrc) || desktopSrc;
@@ -224,45 +243,6 @@ export default function VideoAsset({
         </div>
       ) : null}
 
-      {/* Play / pause control.
-          Two jobs at once. It satisfies WCAG 2.2.2, which wants a way to stop
-          anything that moves on its own for more than five seconds. And it is
-          the only way to start the film on a device that refuses to autoplay —
-          iOS in Low Power Mode blocks autoplay outright, no matter what the
-          markup says, so without this the video simply never moves there. */}
-      {fill && showVideo && !hideControl ? (
-        <button
-          type="button"
-          onClick={() => {
-            const video = resolvedVideoRef.current;
-            if (!video) return;
-            if (video.paused) {
-              video.loop = true;
-              video.play().catch(() => {
-                // A refused play() is not a broken file — leave the frame up.
-              });
-            } else {
-              video.pause();
-            }
-          }}
-          /* glass-dark, not glass: this control only ever appears when there is
-             real footage behind it, and a light panel over dark video composites
-             to a muddy grey that the icon then has to fight. */
-          className={`glass-dark pressable absolute bottom-6 end-[var(--gutter)] z-10 inline-flex h-11 w-11 items-center justify-center rounded-full text-warm-white transition-opacity duration-500 ease-out-strong hover:text-champagne focus-visible:opacity-100 sm:bottom-8 ${
-            isPlaying ? "opacity-35 hover:opacity-100" : "opacity-100"
-          }`}
-        >
-          <span className="sr-only-focusable">
-            {isPlaying ? content.hero.pauseVideo : content.hero.playVideo}
-          </span>
-          {isPlaying ? (
-            <PauseIcon className="h-4 w-4" />
-          ) : (
-            <PlayIcon className="h-4 w-4" />
-          )}
-        </button>
-      ) : null}
-
       {showPoster ? (
         <img
           src={resolveAssetPath(poster)}
@@ -289,14 +269,7 @@ export default function VideoAsset({
           ref={resolvedVideoRef}
           aria-hidden="true"
           tabIndex={-1}
-          onPlay={() => {
-            setIsPlaying(true);
-            onPlayStateChange?.(true);
-          }}
-          onPause={() => {
-            setIsPlaying(false);
-            onPlayStateChange?.(false);
-          }}
+
           onError={() => {
             // The file is there but the browser will not play it — a missing
             // codec, a corrupt upload, a decode error. Fall back to the

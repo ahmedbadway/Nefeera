@@ -55,8 +55,6 @@ export const content = {
     secondaryCta: "See the work",
     secondaryHref: "#gallery",
     scrollHint: "Scroll",
-    playVideo: "Play the background film",
-    pauseVideo: "Pause the background film",
   },
 
   about: {

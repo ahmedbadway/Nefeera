@@ -43,7 +43,7 @@ export function reportHeroPlaybackFailed(failed) {
  * today, and callers transition the colour change rather than snapping it, so a
  * late-arriving "present" crossfades.
  *
- * @returns {{ hasVideo: boolean, hasDarkMedia: boolean }}
+ * @returns {{ hasDarkMedia: boolean }}
  */
 export function useHeroMedia() {
   const { video, images } = content.assets;
@@ -75,7 +75,9 @@ export function useHeroMedia() {
 
   // hasPoster stays local: it feeds hasDarkMedia, but nothing outside this
   // module has ever needed to ask about the poster on its own.
-  return { hasVideo, hasDarkMedia };
+  // hasVideo and hasPoster both stay local: they feed hasDarkMedia, and since
+  // the film lost its play control nothing outside asks about either on its own.
+  return { hasDarkMedia };
 }
 
 export default useHeroMedia;
