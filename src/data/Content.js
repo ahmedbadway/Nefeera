@@ -166,22 +166,23 @@ export const content = {
     headline: "Tell me about your wedding.",
     body: "The fastest way to reach Nefeera is WhatsApp. Send the date you have in mind, roughly how many guests, and where you are thinking — that is enough to start.",
 
+    // CHANGING THE NUMBER: edit these two lines and nothing else.
+    // `whatsapp` is the raw international form wa.me demands — no plus, no
+    // leading zero, no spaces — and the link below is built from it, so the
+    // two can no longer drift apart. `whatsappDisplay` stays written out by
+    // hand because that is a typographic choice, not a derivable one.
     whatsapp: "201278765948",
-    whatsappUrl:
-      "https://wa.me/201278765948?text=Hi%20Nefeera%2C%20I%27d%20like%20to%20talk%20about%20planning%20my%20wedding.",
     whatsappDisplay: "+20 127 876 5948",
     whatsappCta: "Message on WhatsApp",
     whatsappFloatLabel: "Message Nefeera on WhatsApp",
 
     instagram: "https://www.instagram.com/byyomnaelhadad",
     instagramHandle: "@byyomnaelhadad",
-    instagramCta: "See more on Instagram",
 
     // NOTE FOR AHMED: replace EMAIL_PLACEHOLDER with the real address.
     // Until then the email row is hidden from the page automatically —
     // see Contact.jsx. Nothing breaks, it simply does not render.
     email: "EMAIL_PLACEHOLDER",
-    emailCta: "Send an email",
 
     channelsLabel: "Direct channels",
   },
@@ -229,6 +230,18 @@ export const content = {
     ],
   },
 };
+
+/**
+ * The WhatsApp deep link, built from the raw number above so a number change
+ * cannot leave a stale link behind. The prefilled opener matters: a message
+ * already written measurably raises the chance someone actually sends it.
+ *
+ * Assigned after the object literal rather than inside it because an object
+ * cannot reference its own properties while it is still being defined.
+ */
+content.contact.whatsappUrl = `https://wa.me/${content.contact.whatsapp}?text=${encodeURIComponent(
+  "Hi Nefeera, I'd like to talk about planning my wedding."
+)}`;
 
 /**
  * ASSET SPECIFICATIONS — keyed by the exact path in `content.assets`.

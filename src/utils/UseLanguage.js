@@ -76,10 +76,6 @@ export function setLanguage(next) {
   listeners.forEach((notify) => notify());
 }
 
-export function toggleLanguage() {
-  setLanguage(current === "en" ? "ar" : "en");
-}
-
 function subscribe(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);
