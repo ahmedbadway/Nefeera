@@ -1,3 +1,5 @@
+import { useIsRtl } from "../utils/UseLanguage.js";
+
 /**
  * Custom SVG icons.
  *
@@ -19,9 +21,21 @@ const base = {
   focusable: "false",
 };
 
+/**
+ * Arrows and chevrons point along the reading direction, so they mirror under
+ * Arabic. Every other glyph here is symmetric or orientation-free and stays
+ * exactly as drawn — a mirrored WhatsApp mark or magnifier would just look
+ * broken.
+ */
 export function ArrowIcon({ className = "" }) {
+  const isRtl = useIsRtl();
   return (
-    <svg viewBox="0 0 24 24" className={className} {...base}>
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      style={{ transform: isRtl ? "scaleX(-1)" : undefined }}
+      {...base}
+    >
       <path d="M4 12h15" />
       <path d="M13 6l6 6-6 6" />
     </svg>
@@ -38,11 +52,15 @@ export function CloseIcon({ className = "" }) {
 }
 
 export function ChevronIcon({ className = "", direction = "end" }) {
+  const isRtl = useIsRtl();
+  // `direction` is logical, so "start" already means "left in English, right
+  // in Arabic". Two flips cancel: a start-chevron in RTL points right again.
+  const flipped = (direction === "start") !== isRtl;
   return (
     <svg
       viewBox="0 0 24 24"
       className={className}
-      style={{ transform: direction === "start" ? "scaleX(-1)" : undefined }}
+      style={{ transform: flipped ? "scaleX(-1)" : undefined }}
       {...base}
     >
       <path d="M9 5l7 7-7 7" />
@@ -104,6 +122,27 @@ export function PauseIcon({ className = "" }) {
     <svg viewBox="0 0 24 24" className={className} {...base}>
       <path d="M9.5 5v14" />
       <path d="M14.5 5v14" />
+    </svg>
+  );
+}
+
+export function ZoomInIcon({ className = "" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.6-3.6" />
+      <path d="M11 8v6" />
+      <path d="M8 11h6" />
+    </svg>
+  );
+}
+
+export function ZoomOutIcon({ className = "" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.6-3.6" />
+      <path d="M8 11h6" />
     </svg>
   );
 }

@@ -139,6 +139,8 @@ export const content = {
       counterSeparator: "of",
       regionLabel: "Gallery image viewer",
       hint: "Use the arrow keys to move between images. Press Escape to close.",
+      zoomIn: "Zoom in",
+      zoomOut: "Zoom out",
     },
   },
 

@@ -1,4 +1,4 @@
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import Asset from "./Asset.jsx";
 import Reveal from "./Reveal.jsx";
 import SectionHeading from "./SectionHeading.jsx";
@@ -18,7 +18,7 @@ import SectionHeading from "./SectionHeading.jsx";
  * "details to be added" line and talks about the approach instead.
  */
 export default function FeaturedWedding() {
-  const { featured, assets } = content;
+  const { featured, assets } = useContent();
   const hasDetails = featured.details.length > 0;
 
   return (

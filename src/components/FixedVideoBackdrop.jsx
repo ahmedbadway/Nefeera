@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import { useHeroMedia, reportHeroPlaybackFailed } from "../utils/UseHeroMedia.js";
 import VideoAsset from "./VideoAsset.jsx";
 import { PlayIcon, PauseIcon } from "./Icons.jsx";
@@ -31,7 +31,7 @@ import { PlayIcon, PauseIcon } from "./Icons.jsx";
  * Mode, and every visitor with prefers-reduced-motion — see VideoAsset).
  */
 export default function FixedVideoBackdrop() {
-  const { hero, assets } = content;
+  const { hero, assets } = useContent();
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
 

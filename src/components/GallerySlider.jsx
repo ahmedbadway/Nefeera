@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, motion, useMotionValue, useReducedMotion } from "motion/react";
 import { getAssetSpec } from "../data/Content.js";
+import { useIsRtl } from "../utils/UseLanguage.js";
 import Asset from "./Asset.jsx";
 import Reveal from "./Reveal.jsx";
 import { ChevronIcon } from "./Icons.jsx";
@@ -20,7 +21,7 @@ import { ChevronIcon } from "./Icons.jsx";
  *
  * INPUTS: drag with momentum (pointer/touch), the prev/next buttons page by
  * 80% of the viewport, and focusing a card (keyboard Tab) springs it into
- * view. A click that ends a drag is swallowed by the draggingRef guard so a
+ * view. A click that ends a real swipe is swallowed by a distance guard so a
  * fling never opens the lightbox. Under prefers-reduced-motion the whole
  * thing renders as a plain scrollable row with snap points instead.
  *
@@ -37,7 +38,11 @@ import { ChevronIcon } from "./Icons.jsx";
 const SHELL_ALIGNED_PADDING =
   "max(var(--gutter), calc((100% - var(--shell-max)) / 2 + var(--gutter)))";
 
-function GalleryCard({ src, index, viewLabel, onOpen, draggingRef }) {
+// How far a gesture may travel and still count as a tap. Matches the ~10px
+// browsers themselves allow before a touch stops being a click.
+const TAP_SLOP = 10;
+
+function GalleryCard({ src, index, viewLabel, onOpen, draggedFarRef }) {
   const spec = getAssetSpec(src);
   const label = `Gallery ${String(index + 1).padStart(2, "0")}`;
 
@@ -49,8 +54,12 @@ function GalleryCard({ src, index, viewLabel, onOpen, draggingRef }) {
       <button
         type="button"
         onClick={() => {
-          // A pointer-up at the end of a fling is a drag, not a choice.
-          if (draggingRef.current) return;
+          // Swallow the click that ends a real drag, but only a real one.
+          // No finger taps a phone without a few pixels of travel, so gating
+          // on "a drag started" made every tap on a card do nothing. Gate on
+          // DISTANCE instead: past the threshold it was a swipe, under it the
+          // person meant to open the picture.
+          if (draggedFarRef.current) return;
           onOpen(index);
         }}
         className="glass-frame group relative block h-full rounded-2xl"
@@ -74,9 +83,12 @@ function GalleryCard({ src, index, viewLabel, onOpen, draggingRef }) {
 
 export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels }) {
   const prefersReducedMotion = useReducedMotion();
+  const isRtl = useIsRtl();
   const viewportRef = useRef(null);
   const trackRef = useRef(null);
-  const draggingRef = useRef(false);
+  // True only once a gesture has travelled far enough to be a swipe rather
+  // than a tap. Read by the cards to decide whether their click was meant.
+  const draggedFarRef = useRef(false);
   const x = useMotionValue(0);
   const [constraints, setConstraints] = useState({ left: 0, right: 0 });
 
@@ -88,10 +100,14 @@ export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels 
     if (!viewport || !track) return undefined;
 
     const measure = () => {
-      const overflow = track.scrollWidth - viewport.offsetWidth;
-      // LTR: dragging start-ward means negative x. TODO for the Arabic pass:
-      // flip to { left: 0, right: overflow } when dir="rtl".
-      setConstraints({ left: -Math.max(overflow, 0), right: 0 });
+      const overflow = Math.max(track.scrollWidth - viewport.offsetWidth, 0);
+      // Direction decides which way the overflow lies. In LTR the strip runs
+      // off the right edge and dragging it into view means negative x; under
+      // dir="rtl" the flex row starts at the right, so the overflow — and the
+      // whole drag range — mirrors.
+      setConstraints(
+        isRtl ? { left: 0, right: overflow } : { left: -overflow, right: 0 }
+      );
     };
 
     measure();
@@ -113,7 +129,7 @@ export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels 
       observer.disconnect();
       viewport.removeEventListener("scroll", resetScroll);
     };
-  }, [prefersReducedMotion, images.length]);
+  }, [prefersReducedMotion, images.length, isRtl]);
 
   const clampX = (value) =>
     Math.min(constraints.right, Math.max(constraints.left, value));
@@ -124,7 +140,9 @@ export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels 
   const page = (direction) => {
     const viewport = viewportRef.current;
     if (!viewport) return;
-    springTo(x.get() - direction * viewport.offsetWidth * 0.8);
+    // `direction` is 1 for "next", which is right in LTR and left in RTL.
+    const step = viewport.offsetWidth * 0.8 * (isRtl ? -1 : 1);
+    springTo(x.get() - direction * step);
   };
 
   // Keyboard: bring the focused card fully into view.
@@ -166,7 +184,7 @@ export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels 
               index={index}
               viewLabel={viewLabel}
               onOpen={onOpen}
-              draggingRef={draggingRef}
+              draggedFarRef={draggedFarRef}
             />
           </div>
         ))}
@@ -193,14 +211,20 @@ export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels 
             bounceStiffness: 240,
             bounceDamping: 28,
           }}
-          onDragStart={() => {
-            draggingRef.current = true;
+          onPointerDownCapture={() => {
+            // Every gesture starts innocent; the move handler decides.
+            draggedFarRef.current = false;
+          }}
+          onDrag={(event, info) => {
+            if (Math.abs(info.offset.x) > TAP_SLOP) {
+              draggedFarRef.current = true;
+            }
           }}
           onDragEnd={() => {
-            // Cleared on the next frame so the click fired by this pointer-up
-            // still sees the guard.
+            // Cleared a frame later so the click fired by this same pointer-up
+            // still sees the guard; the next pointerdown resets it anyway.
             requestAnimationFrame(() => {
-              draggingRef.current = false;
+              draggedFarRef.current = false;
             });
           }}
           onFocus={onCardFocus}
@@ -213,7 +237,7 @@ export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels 
                 index={index}
                 viewLabel={viewLabel}
                 onOpen={onOpen}
-                draggingRef={draggingRef}
+                draggedFarRef={draggedFarRef}
               />
             </div>
           ))}

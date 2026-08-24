@@ -1,4 +1,4 @@
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import Asset from "./Asset.jsx";
 import Reveal from "./Reveal.jsx";
 import SectionHeading from "./SectionHeading.jsx";
@@ -15,7 +15,7 @@ import SectionHeading from "./SectionHeading.jsx";
  * backdrop, and nested backdrop-filters are banned (Global.css).
  */
 export default function About() {
-  const { about, assets } = content;
+  const { about, assets } = useContent();
 
   return (
     <section

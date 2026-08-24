@@ -29,10 +29,12 @@ export default {
         "champagne-deep": "oklch(var(--champagne-deep) / <alpha-value>)",
       },
       fontFamily: {
-        // Italiana ships in weight 400 only — never pair font-display with a
+        // Read through variables so a language switch swaps the whole type
+        // system at the <html> level — see the :lang(ar) block in Theme.css.
+        // Italiana ships in weight 400 only: never pair font-display with a
         // weight utility, the browser would synthesize a fake bold.
-        display: ["Italiana", "Didot", "Georgia", "serif"],
-        body: ["Outfit", "system-ui", "-apple-system", "'Segoe UI'", "sans-serif"],
+        display: "var(--font-display)",
+        body: "var(--font-body)",
       },
       letterSpacing: {
         wide2: "0.22em",

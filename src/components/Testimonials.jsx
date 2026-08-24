@@ -1,4 +1,4 @@
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import Reveal from "./Reveal.jsx";
 import SectionHeading from "./SectionHeading.jsx";
 
@@ -20,7 +20,7 @@ import SectionHeading from "./SectionHeading.jsx";
  * template shape this avoids.
  */
 export default function Testimonials() {
-  const { testimonials } = content;
+  const { testimonials } = useContent();
 
   // Vertical offsets, applied only from the large breakpoint up.
   const offsets = ["lg:mt-0", "lg:mt-14", "lg:mt-6"];

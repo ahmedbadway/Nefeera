@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import GallerySlider from "./GallerySlider.jsx";
 import Lightbox from "./Lightbox.jsx";
 import SectionHeading from "./SectionHeading.jsx";
@@ -20,7 +20,7 @@ import SectionHeading from "./SectionHeading.jsx";
  * fight the full-bleed strip below it.
  */
 export default function Gallery() {
-  const { gallery, assets } = content;
+  const { gallery, assets } = useContent();
   const [openIndex, setOpenIndex] = useState(null);
 
   return (

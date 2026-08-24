@@ -6,8 +6,9 @@ import {
   useReducedMotion,
   useScroll,
 } from "motion/react";
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import Button from "./Button.jsx";
+import LanguageToggle from "./LanguageToggle.jsx";
 import Logo from "./Logo.jsx";
 import { MenuIcon, CloseIcon, WhatsAppIcon } from "./Icons.jsx";
 
@@ -33,7 +34,8 @@ import { MenuIcon, CloseIcon, WhatsAppIcon } from "./Icons.jsx";
  * planned Arabic RTL pass is a direction flip with no layout rewrite.
  */
 export default function Nav() {
-  const { nav, contact } = content;
+  const content = useContent();
+  const { nav, contact } = useContent();
   const prefersReducedMotion = useReducedMotion();
 
   const [scrolled, setScrolled] = useState(false);
@@ -108,17 +110,21 @@ export default function Nav() {
             <Logo variant="inline" size="xs" color="dark" />
           </a>
 
-          <button
-            ref={menuButtonRef}
-            type="button"
-            onClick={() => setMenuOpen(true)}
-            aria-expanded={menuOpen}
-            aria-controls="site-menu"
-            className="pressable inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink/5 text-ink transition-colors duration-200 hover:bg-ink/10"
-          >
-            <span className="sr-only-focusable">{nav.openMenu}</span>
-            <MenuIcon className="h-6 w-6" />
-          </button>
+          <div className="flex items-center gap-2">
+            <LanguageToggle variant="pill" />
+
+            <button
+              ref={menuButtonRef}
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-expanded={menuOpen}
+              aria-controls="site-menu"
+              className="pressable inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink/5 text-ink transition-colors duration-200 hover:bg-ink/10"
+            >
+              <span className="sr-only-focusable">{nav.openMenu}</span>
+              <MenuIcon className="h-6 w-6" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -138,15 +144,18 @@ export default function Nav() {
             <div className="shell flex h-full flex-col">
               <div className="flex items-center justify-between py-5">
                 <Logo variant="inline" size="xs" color="dark" />
-                <button
-                  ref={closeButtonRef}
-                  type="button"
-                  onClick={() => setMenuOpen(false)}
-                  className="pressable inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink/5 text-ink transition-colors duration-200 hover:bg-ink/10"
-                >
-                  <span className="sr-only-focusable">{nav.closeMenu}</span>
-                  <CloseIcon className="h-6 w-6" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <LanguageToggle variant="pill" />
+                  <button
+                    ref={closeButtonRef}
+                    type="button"
+                    onClick={() => setMenuOpen(false)}
+                    className="pressable inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink/5 text-ink transition-colors duration-200 hover:bg-ink/10"
+                  >
+                    <span className="sr-only-focusable">{nav.closeMenu}</span>
+                    <CloseIcon className="h-6 w-6" />
+                  </button>
+                </div>
               </div>
 
               <nav

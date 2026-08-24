@@ -1,4 +1,4 @@
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import { useFirstAvailableAsset } from "../utils/AssetProbe.js";
 import { resolveAssetPath } from "../utils/ResolveAssetPath.js";
 
@@ -115,6 +115,7 @@ export default function Logo({
   size = "md",
   className = "",
 }) {
+  const content = useContent();
   const { images } = content.assets;
   const { brand } = content;
 

@@ -1,4 +1,4 @@
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import Logo from "./Logo.jsx";
 import { InstagramIcon, WhatsAppIcon } from "./Icons.jsx";
 
@@ -13,7 +13,7 @@ import { InstagramIcon, WhatsAppIcon } from "./Icons.jsx";
  * stale in January.
  */
 export default function Footer() {
-  const { footer, nav, contact, brand } = content;
+  const { footer, nav, contact, brand } = useContent();
   const year = new Date().getFullYear();
 
   return (
