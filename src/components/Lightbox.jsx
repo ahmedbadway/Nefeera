@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { content, getAssetSpec } from "../data/Content.js";
+import { getAssetSpec } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import Asset from "./Asset.jsx";
 import ZoomableImage from "./ZoomableImage.jsx";
 import { CloseIcon, ChevronIcon, ZoomInIcon, ZoomOutIcon } from "./Icons.jsx";
@@ -32,7 +33,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
   const [zoomed, setZoomed] = useState(false);
 
   const isOpen = index !== null && index >= 0;
-  const copy = content.gallery.lightbox;
+  const copy = useContent().gallery.lightbox;
 
   const goNext = useCallback(() => {
     if (!isOpen) return;

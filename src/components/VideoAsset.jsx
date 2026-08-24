@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import { PlayIcon, PauseIcon } from "./Icons.jsx";
 import { getAssetSpec, getAssetRequirementLabel, getAssetFilename } from "../data/Content.js";
 import { buildPlaceholderSvg } from "../utils/PlaceholderSvg.js";
@@ -68,6 +68,7 @@ export default function VideoAsset({
   videoRef = null,
   onPlayStateChange,
 }) {
+  const content = useContent();
   const prefersReducedMotion = useReducedMotion();
   const isPhone = useMediaQuery("(max-width: 767px)");
 

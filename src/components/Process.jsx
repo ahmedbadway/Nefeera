@@ -1,4 +1,4 @@
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import Reveal from "./Reveal.jsx";
 import SectionHeading from "./SectionHeading.jsx";
 
@@ -20,7 +20,7 @@ import SectionHeading from "./SectionHeading.jsx";
 const STEP_INDENTS = ["", "lg:ps-12", "lg:ps-24", "lg:ps-36"];
 
 export default function Process() {
-  const { process } = content;
+  const { process } = useContent();
 
   return (
     <section

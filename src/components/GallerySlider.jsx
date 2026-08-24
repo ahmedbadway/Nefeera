@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, motion, useMotionValue, useReducedMotion } from "motion/react";
 import { getAssetSpec } from "../data/Content.js";
+import { useIsRtl } from "../utils/UseLanguage.js";
 import Asset from "./Asset.jsx";
 import Reveal from "./Reveal.jsx";
 import { ChevronIcon } from "./Icons.jsx";
@@ -82,6 +83,7 @@ function GalleryCard({ src, index, viewLabel, onOpen, draggedFarRef }) {
 
 export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels }) {
   const prefersReducedMotion = useReducedMotion();
+  const isRtl = useIsRtl();
   const viewportRef = useRef(null);
   const trackRef = useRef(null);
   // True only once a gesture has travelled far enough to be a swipe rather
@@ -98,10 +100,14 @@ export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels 
     if (!viewport || !track) return undefined;
 
     const measure = () => {
-      const overflow = track.scrollWidth - viewport.offsetWidth;
-      // LTR: dragging start-ward means negative x. TODO for the Arabic pass:
-      // flip to { left: 0, right: overflow } when dir="rtl".
-      setConstraints({ left: -Math.max(overflow, 0), right: 0 });
+      const overflow = Math.max(track.scrollWidth - viewport.offsetWidth, 0);
+      // Direction decides which way the overflow lies. In LTR the strip runs
+      // off the right edge and dragging it into view means negative x; under
+      // dir="rtl" the flex row starts at the right, so the overflow — and the
+      // whole drag range — mirrors.
+      setConstraints(
+        isRtl ? { left: 0, right: overflow } : { left: -overflow, right: 0 }
+      );
     };
 
     measure();
@@ -123,7 +129,7 @@ export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels 
       observer.disconnect();
       viewport.removeEventListener("scroll", resetScroll);
     };
-  }, [prefersReducedMotion, images.length]);
+  }, [prefersReducedMotion, images.length, isRtl]);
 
   const clampX = (value) =>
     Math.min(constraints.right, Math.max(constraints.left, value));
@@ -134,7 +140,9 @@ export default function GallerySlider({ images, onOpen, viewLabel, pagingLabels 
   const page = (direction) => {
     const viewport = viewportRef.current;
     if (!viewport) return;
-    springTo(x.get() - direction * viewport.offsetWidth * 0.8);
+    // `direction` is 1 for "next", which is right in LTR and left in RTL.
+    const step = viewport.offsetWidth * 0.8 * (isRtl ? -1 : 1);
+    springTo(x.get() - direction * step);
   };
 
   // Keyboard: bring the focused card fully into view.

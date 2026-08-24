@@ -81,7 +81,7 @@ export default function Button({
       {arrow ? (
         <span
           aria-hidden="true"
-          className={`ms-2 flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-300 ease-out-strong group-hover:-translate-y-px group-hover:translate-x-1 ${circle}`}
+          className={`ms-2 flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-300 ease-out-strong group-hover:-translate-y-px group-hover:translate-x-1 rtl:group-hover:-translate-x-1 ${circle}`}
         >
           <ArrowIcon className="h-4 w-4" />
         </span>

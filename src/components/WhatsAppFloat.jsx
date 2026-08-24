@@ -6,7 +6,7 @@ import {
   useReducedMotion,
   useScroll,
 } from "motion/react";
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import { WhatsAppIcon } from "./Icons.jsx";
 
 /**
@@ -31,7 +31,7 @@ import { WhatsAppIcon } from "./Icons.jsx";
  * number anywhere in the codebase.
  */
 export default function WhatsAppFloat() {
-  const { contact } = content;
+  const { contact } = useContent();
   const prefersReducedMotion = useReducedMotion();
   const [visible, setVisible] = useState(false);
 

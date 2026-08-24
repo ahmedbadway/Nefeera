@@ -57,6 +57,12 @@
      ≥4.6:1 over pure-black footage. Do not lower either number. */
   --backdrop-veil: 0.32;
 
+  /* Type. Held as variables so switching language re-dresses the whole site
+     from one attribute on <html> — no component knows which language it is
+     rendering. */
+  --font-display: Italiana, Didot, Georgia, serif;
+  --font-body: Outfit, system-ui, -apple-system, "Segoe UI", sans-serif;
+
   /* Motion curves — from the Emil Kowalski motion system.
      The built-in CSS easings are too weak to read as intentional. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -74,4 +80,14 @@
     --glass-blur: 10px;
     --glass-blur-frame: 8px;
   }
+}
+
+/* Arabic type. Reem Kufi holds the display register Italiana holds in
+   English; Tajawal is the body face. Arabic sets shorter than Latin at the
+   same size and has no capitals to carry tracking, so the display scale is
+   nudged up and the letter-spacing zeroed — tracked-out Arabic is not a
+   style, it is a mistake, since it breaks the joins between letters. */
+:root:lang(ar) {
+  --font-display: "Reem Kufi", "Noto Kufi Arabic", system-ui, sans-serif;
+  --font-body: Tajawal, "Noto Sans Arabic", system-ui, sans-serif;
 }

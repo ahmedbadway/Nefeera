@@ -44,6 +44,25 @@
     letter-spacing: 0.01em;
   }
 
+  /* Arabic headings need room above the line for their marks, and must never
+     be tracked out — spacing breaks the letter joins. */
+  :lang(ar) h1,
+  :lang(ar) h2,
+  :lang(ar) h3,
+  :lang(ar) h4 {
+    line-height: 1.35;
+    letter-spacing: 0;
+  }
+
+  /* Arabic body copy also sits taller than Latin at the same size. */
+  :lang(ar) body,
+  :lang(ar) p,
+  :lang(ar) li,
+  :lang(ar) dd,
+  :lang(ar) dt {
+    letter-spacing: 0;
+  }
+
   /* Visible, branded focus ring on every interactive element.
      Never remove this — keyboard navigation depends on it. The warm-white halo
      keeps the ring legible when it lands over dark glass or raw video. */
@@ -78,6 +97,15 @@
     letter-spacing: 0.32em;
     text-transform: uppercase;
     color: var(--color-sage-deep);
+  }
+
+  /* Arabic joins its letters, so letter-spacing pulls the word apart and
+     uppercase means nothing. Both are dropped, and the size comes up a step
+     to match the optical weight the Latin tracking was providing. */
+  :lang(ar) .eyebrow {
+    font-size: 0.8125rem;
+    letter-spacing: 0;
+    text-transform: none;
   }
 
   /* Press feedback on every pressable element (motion system rule). */

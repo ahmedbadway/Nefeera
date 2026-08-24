@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "motion/react";
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import { useHeroMedia } from "../utils/UseHeroMedia.js";
 import Button from "./Button.jsx";
 import { WhatsAppIcon } from "./Icons.jsx";
@@ -24,7 +24,7 @@ import { WhatsAppIcon } from "./Icons.jsx";
  * a centered hero is the generic default this project exists to avoid.
  */
 export default function Hero() {
-  const { hero, contact } = content;
+  const { hero, contact } = useContent();
   const prefersReducedMotion = useReducedMotion();
 
   // hasDarkMedia, not hasVideo: a poster with no playable film still puts a

@@ -1,4 +1,4 @@
-import { content } from "../data/Content.js";
+import { useContent } from "../utils/UseLanguage.js";
 import Button from "./Button.jsx";
 import Reveal from "./Reveal.jsx";
 import { WhatsAppIcon, InstagramIcon, MailIcon, ArrowIcon } from "./Icons.jsx";
@@ -20,7 +20,7 @@ import { WhatsAppIcon, InstagramIcon, MailIcon, ArrowIcon } from "./Icons.jsx";
  * A mailto pointing at a placeholder is worse than no email row at all.
  */
 export default function Contact() {
-  const { contact } = content;
+  const { contact } = useContent();
 
   const hasEmail = Boolean(contact.email) && contact.email !== "EMAIL_PLACEHOLDER";
 
@@ -92,7 +92,7 @@ export default function Contact() {
                         {contact.whatsappDisplay}
                       </span>
                     </span>
-                    <ArrowIcon className="h-4 w-4 shrink-0 opacity-45 transition-all duration-300 ease-out-strong group-hover:translate-x-1 group-hover:opacity-100" />
+                    <ArrowIcon className="h-4 w-4 shrink-0 opacity-45 transition-all duration-300 ease-out-strong group-hover:translate-x-1 group-hover:opacity-100 rtl:group-hover:-translate-x-1" />
                   </a>
                 </li>
 
@@ -109,7 +109,7 @@ export default function Contact() {
                         {contact.instagramHandle}
                       </span>
                     </span>
-                    <ArrowIcon className="h-4 w-4 shrink-0 opacity-45 transition-all duration-300 ease-out-strong group-hover:translate-x-1 group-hover:opacity-100" />
+                    <ArrowIcon className="h-4 w-4 shrink-0 opacity-45 transition-all duration-300 ease-out-strong group-hover:translate-x-1 group-hover:opacity-100 rtl:group-hover:-translate-x-1" />
                   </a>
                 </li>
 
@@ -125,7 +125,7 @@ export default function Contact() {
                           {contact.email}
                         </span>
                       </span>
-                      <ArrowIcon className="h-4 w-4 shrink-0 opacity-45 transition-all duration-300 ease-out-strong group-hover:translate-x-1 group-hover:opacity-100" />
+                      <ArrowIcon className="h-4 w-4 shrink-0 opacity-45 transition-all duration-300 ease-out-strong group-hover:translate-x-1 group-hover:opacity-100 rtl:group-hover:-translate-x-1" />
                     </a>
                   </li>
                 ) : null}
