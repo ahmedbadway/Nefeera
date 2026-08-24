@@ -107,3 +107,24 @@ export function PauseIcon({ className = "" }) {
     </svg>
   );
 }
+
+export function ZoomInIcon({ className = "" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.6-3.6" />
+      <path d="M11 8v6" />
+      <path d="M8 11h6" />
+    </svg>
+  );
+}
+
+export function ZoomOutIcon({ className = "" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.6-3.6" />
+      <path d="M8 11h6" />
+    </svg>
+  );
+}

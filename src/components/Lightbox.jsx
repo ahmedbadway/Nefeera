@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { content, getAssetSpec } from "../data/Content.js";
 import Asset from "./Asset.jsx";
-import { CloseIcon, ChevronIcon } from "./Icons.jsx";
+import ZoomableImage from "./ZoomableImage.jsx";
+import { CloseIcon, ChevronIcon, ZoomInIcon, ZoomOutIcon } from "./Icons.jsx";
 
 /**
  * Gallery lightbox.
@@ -26,6 +28,8 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previouslyFocused = useRef(null);
+  const zoomRef = useRef(null);
+  const [zoomed, setZoomed] = useState(false);
 
   const isOpen = index !== null && index >= 0;
   const copy = content.gallery.lightbox;
@@ -114,7 +118,14 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
   const currentSrc = isOpen ? images[index] : null;
   const currentSpec = currentSrc ? getAssetSpec(currentSrc) : null;
 
-  return (
+  // PORTALLED TO THE BODY ON PURPOSE. The gallery sits inside <main>, which
+  // carries `relative z-10` so the page floats over the fixed film. That makes
+  // main a stacking context, and a stacking context is a ceiling: the dialog's
+  // z-[70] only ranks it against its siblings INSIDE main, so the header
+  // (z-50) and the WhatsApp float (z-40) — both root-level — painted straight
+  // over an open photo. Rendering into the body puts the dialog back in the
+  // root stack where its z-index means what it says.
+  return createPortal(
     <AnimatePresence>
       {isOpen ? (
         <motion.div
@@ -122,7 +133,10 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
           role="dialog"
           aria-modal="true"
           aria-label={copy.regionLabel}
-          className="fixed inset-0 z-[70] flex flex-col bg-ink/92 backdrop-blur-sm"
+          /* 95, not 92: Tailwind only generates opacity modifiers from its own
+             scale, so `bg-ink/92` compiled to nothing at all and the dialog
+             spent a release with a fully transparent backdrop. */
+          className="fixed inset-0 z-[70] flex flex-col bg-ink/95 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -151,7 +165,8 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
             </button>
           </div>
 
-          {/* Stage. Clicking the backdrop closes; clicking the image does not. */}
+          {/* Stage. Clicking the backdrop closes; the picture itself does not —
+              it is a zoom surface, so every gesture on it belongs to the zoom. */}
           <div
             className="flex min-h-0 flex-1 items-center justify-center px-4 pb-4 sm:px-8"
             onClick={onClose}
@@ -171,13 +186,24 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
                 ease: [0.23, 1, 0.32, 1],
               }}
             >
-              <Asset
-                src={currentSrc}
-                ratio={currentSpec?.ratio}
-                objectFit="contain"
-                priority
-                className="h-auto max-h-[72vh] w-auto max-w-[92vw] sm:max-h-[76vh]"
-              />
+              <ZoomableImage
+                ref={zoomRef}
+                resetKey={currentSrc}
+                onZoomChange={setZoomed}
+              >
+                {/* A DEFINITE height, not a max: the zoom frame clips its
+                    content, which cuts the chain an `aspect-ratio` box uses to
+                    resolve `max-height` into a real size — the picture came
+                    out 0x0. Fixed height plus the ratio gives the width, and
+                    the frame then hugs the result. */}
+                <Asset
+                  src={currentSrc}
+                  ratio={currentSpec?.ratio}
+                  objectFit="contain"
+                  priority
+                  className="h-[72vh] w-auto max-w-[92vw] sm:h-[76vh]"
+                />
+              </ZoomableImage>
             </motion.div>
           </div>
 
@@ -193,6 +219,27 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
               <ChevronIcon className="h-5 w-5" direction="start" />
             </button>
 
+            {/* Zoom, for everyone who is not going to think to pinch — and for
+                anyone on a mouse, where there is nothing to pinch with. */}
+            <button
+              type="button"
+              onClick={() => zoomRef.current?.zoomOut()}
+              className="glass-pill-dark pressable inline-flex h-12 w-12 items-center justify-center rounded-full text-warm-white transition-opacity duration-200 hover:text-champagne disabled:opacity-35"
+              disabled={!zoomed}
+            >
+              <span className="sr-only-focusable">{copy.zoomOut}</span>
+              <ZoomOutIcon className="h-5 w-5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => zoomRef.current?.zoomIn()}
+              className="glass-pill-dark pressable inline-flex h-12 w-12 items-center justify-center rounded-full text-warm-white hover:text-champagne"
+            >
+              <span className="sr-only-focusable">{copy.zoomIn}</span>
+              <ZoomInIcon className="h-5 w-5" />
+            </button>
+
             <button
               type="button"
               onClick={goNext}
@@ -204,6 +251,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
           </div>
         </motion.div>
       ) : null}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
