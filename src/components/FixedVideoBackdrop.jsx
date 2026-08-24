@@ -1,5 +1,5 @@
 import { useContent } from "../utils/UseLanguage.js";
-import { reportHeroPlaybackFailed } from "../utils/UseHeroMedia.js";
+import { reportFilmShowing, reportHeroPlaybackFailed } from "../utils/UseHeroMedia.js";
 import VideoAsset from "./VideoAsset.jsx";
 
 /**
@@ -33,11 +33,10 @@ export default function FixedVideoBackdrop() {
   const { assets } = useContent();
 
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0"
-      style={{ transform: "translateZ(0)" }}
-    >
+    // No transform on this layer. It carried a translateZ(0) compositing hint,
+    // but a transform on an ancestor of a <video> is one of the ways iOS Safari
+    // is known to stop painting it, and the hint bought nothing measurable.
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
       <VideoAsset
         fill
         objectPositionClass="object-[35%_15%] md:object-center"
@@ -46,6 +45,7 @@ export default function FixedVideoBackdrop() {
         webmSrc={assets.video.heroWebm}
         poster={assets.images.heroPoster}
         label="Background film"
+        onFilmShowing={reportFilmShowing}
         onPlaybackFailed={reportHeroPlaybackFailed}
       />
 

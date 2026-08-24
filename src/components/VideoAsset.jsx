@@ -52,6 +52,9 @@ const MAX_MEDIA_RETRIES = 2;
  *   layout can stop styling itself for dark media it is not actually getting.
  * @param {React.RefObject} [props.videoRef] External ref attached to the
  *   <video> element, for a parent that needs to inspect playback.
+ * @param {(showing: boolean) => void} [props.onFilmShowing] Fires when the
+ *   element actually starts or stops rendering frames. This is what the hero
+ *   styles against — "the file exists" is a different and much weaker claim.
  */
 export default function VideoAsset({
   desktopSrc,
@@ -65,6 +68,7 @@ export default function VideoAsset({
   objectPositionClass = "object-center",
   onPlaybackFailed,
   videoRef = null,
+  onFilmShowing,
 }) {
   const prefersReducedMotion = useReducedMotion();
   const isPhone = useMediaQuery("(max-width: 767px)");
@@ -173,7 +177,19 @@ export default function VideoAsset({
       }
     };
 
+    // A gesture is the one moment iOS will fetch video it has refused to fetch
+    // on its own — on a cellular connection or in Low Power Mode it downloads
+    // NOTHING up front, `preload` included, so readyState sits at 0 and play()
+    // has no data to start from. Kicking load() inside the gesture is what
+    // turns the refusal around; calling play() alone just stalls.
     function onGesture() {
+      if (video.readyState === 0) {
+        try {
+          video.load();
+        } catch {
+          // Nothing to recover from; the play attempt below still runs.
+        }
+      }
       attemptPlay();
     }
 
@@ -222,6 +238,7 @@ export default function VideoAsset({
       return;
     }
 
+    onFilmShowing?.(false);
     setPlaybackFailed(true);
     onPlaybackFailed?.(true);
   };
@@ -321,16 +338,30 @@ export default function VideoAsset({
           ref={resolvedVideoRef}
           aria-hidden="true"
           tabIndex={-1}
+          // A DIRECT src, not <source> children, whenever there is only one
+          // file to offer — which is every case this site actually ships.
+          // Safari's resource selection over <source> is the fragile path: it
+          // is where "the file is fine but nothing plays" reports come from,
+          // and it gives load() nothing obvious to re-fetch. With a single
+          // candidate the element list buys nothing anyway.
+          src={sources.length === 1 ? resolveAssetPath(sources[0].src) : undefined}
 
+          // `playing` is the only event that means pixels are on screen. The
+          // hero dresses itself off this, never off the file's existence.
+          onPlaying={() => onFilmShowing?.(true)}
+          onPause={() => onFilmShowing?.(false)}
+          onEmptied={() => onFilmShowing?.(false)}
           onError={handleMediaError}
         >
-          {sources.map((source) => (
-            <source
-              key={source.src}
-              src={resolveAssetPath(source.src)}
-              type={source.type}
-            />
-          ))}
+          {sources.length > 1
+            ? sources.map((source) => (
+                <source
+                  key={source.src}
+                  src={resolveAssetPath(source.src)}
+                  type={source.type}
+                />
+              ))
+            : null}
         </video>
       ) : null}
     </div>
