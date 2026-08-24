@@ -1,82 +1,77 @@
-import { useEffect, useReducer } from "react";
+import { useSyncExternalStore } from "react";
 import { content } from "../data/Content.js";
-import { useAssetExists, useFirstAvailableAsset } from "./AssetProbe.js";
+import { useAssetExists } from "./AssetProbe.js";
 
 /**
- * Whether the backdrop film failed to actually PLAY, as opposed to failing to
- * exist. (The film lives in FixedVideoBackdrop behind the whole page; the hero
- * is still the consumer that styles itself against it.)
+ * Is there actually a dark picture behind the hero copy right now?
  *
- * The probe answers "is the file on the server". That is not the same question as
- * "is there a dark moving picture behind the headline right now". A file can be
- * present and still not play: a codec the browser lacks, a corrupt upload, a
- * decode error. When that happens VideoAsset drops back to the placeholder
- * field — and if the hero were still styling itself for video, warm-white type
- * would be sitting on a light panel, invisible.
+ * THE QUESTION THIS ANSWERS CHANGED, AND THAT WAS THE BUG.
+ * It used to answer "does a video file exist on the server", which the probe
+ * can tell you. But that is not the same question, and on iOS the gap between
+ * them is visible: a <video> that has not started playing paints NOTHING when
+ * there is no poster, so the file existed, the hero dressed itself for dark
+ * footage — warm-white type over a heavy ink scrim — and what actually sat
+ * behind it was the light placeholder field. The result read as a muddy green
+ * rectangle rather than either of the two states that were designed.
  *
- * Hero and FixedVideoBackdrop are siblings rather than parent and child, so this
- * is a tiny module-level store rather than a context: the backdrop reports, the
- * hero re-renders.
+ * So the answer now comes from the element itself: the backdrop reports when
+ * the film is genuinely rendering, and only then does the hero dress for it.
+ * Every way playback can fail to start — a blocked autoplay, a slow file, a
+ * decode error, Low Power Mode — lands on the light editorial hero, which is a
+ * designed state rather than an accident.
+ *
+ * Hero and FixedVideoBackdrop are siblings rather than parent and child, so
+ * this is a tiny module-level store rather than a context: the backdrop
+ * reports, the hero re-renders.
  */
-let heroPlaybackFailed = false;
-const playbackListeners = new Set();
+let filmIsShowing = false;
+const listeners = new Set();
 
-export function reportHeroPlaybackFailed(failed) {
-  if (heroPlaybackFailed === failed) return;
-  heroPlaybackFailed = failed;
-  playbackListeners.forEach((notify) => notify());
+function notify() {
+  listeners.forEach((listener) => listener());
 }
 
 /**
- * What is actually behind the hero copy right now?
- *
- * The hero styles its type and scrim off `hasDarkMedia`; FixedVideoBackdrop
- * gates its pause control on `hasVideo`. The probe cache in AssetProbe.js is
- * keyed by path, so every caller here shares one HEAD request per file.
- *
- * WHY `hasDarkMedia` IS NOT THE SAME AS `hasVideo`:
- * The question the styling actually needs answered is "is there a dark image
- * behind the text", and the video is not always what ends up there — a poster
- * with no playable film still puts a dark picture behind the copy.
- *
- * `pending` counts as absent on purpose — that is the state the site ships in
- * today, and callers transition the colour change rather than snapping it, so a
- * late-arriving "present" crossfades.
+ * Called by the backdrop when the film starts or stops actually rendering.
+ * @param {boolean} showing
+ */
+export function reportFilmShowing(showing) {
+  if (filmIsShowing === showing) return;
+  filmIsShowing = showing;
+  notify();
+}
+
+/** Kept for the failure path: a film that cannot play is not showing. */
+export function reportHeroPlaybackFailed(failed) {
+  if (failed) reportFilmShowing(false);
+}
+
+function subscribe(listener) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function getFilmIsShowing() {
+  return filmIsShowing;
+}
+
+/**
+ * `pending` counts as absent on purpose — that is the state the page opens in,
+ * and the hero transitions its colours rather than snapping them, so a film
+ * that starts a moment later crossfades in.
  *
  * @returns {{ hasDarkMedia: boolean }}
  */
 export function useHeroMedia() {
-  const { video, images } = content.assets;
+  const { images } = content.assets;
 
-  // Re-render this consumer whenever playback state changes.
-  const [, forceUpdate] = useReducer((n) => n + 1, 0);
-  useEffect(() => {
-    playbackListeners.add(forceUpdate);
-    return () => {
-      playbackListeners.delete(forceUpdate);
-    };
-  }, []);
-
-  const videoProbe = useFirstAvailableAsset([
-    video.heroWebm,
-    video.heroDesktop,
-    video.heroMobile,
-  ]);
+  const showing = useSyncExternalStore(subscribe, getFilmIsShowing, getFilmIsShowing);
   const posterStatus = useAssetExists(images.heroPoster);
 
-  // A file that exists but cannot play is not media, for styling purposes.
-  const hasVideo = videoProbe.status === "present" && !heroPlaybackFailed;
-  const hasPoster = posterStatus === "present";
+  // A poster counts too: it is a real dark still, and it is what visitors with
+  // reduced motion see in place of the film.
+  const hasDarkMedia = showing || posterStatus === "present";
 
-  // Reduced motion no longer removes the picture — VideoAsset holds the video's
-  // first frame paused when there is no poster — so the same media counts in
-  // both cases. Only a genuinely absent or unplayable file leaves the hero light.
-  const hasDarkMedia = hasVideo || hasPoster;
-
-  // hasPoster stays local: it feeds hasDarkMedia, but nothing outside this
-  // module has ever needed to ask about the poster on its own.
-  // hasVideo and hasPoster both stay local: they feed hasDarkMedia, and since
-  // the film lost its play control nothing outside asks about either on its own.
   return { hasDarkMedia };
 }
 

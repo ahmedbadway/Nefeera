@@ -52,6 +52,9 @@ const MAX_MEDIA_RETRIES = 2;
  *   layout can stop styling itself for dark media it is not actually getting.
  * @param {React.RefObject} [props.videoRef] External ref attached to the
  *   <video> element, for a parent that needs to inspect playback.
+ * @param {(showing: boolean) => void} [props.onFilmShowing] Fires when the
+ *   element actually starts or stops rendering frames. This is what the hero
+ *   styles against — "the file exists" is a different and much weaker claim.
  */
 export default function VideoAsset({
   desktopSrc,
@@ -65,6 +68,7 @@ export default function VideoAsset({
   objectPositionClass = "object-center",
   onPlaybackFailed,
   videoRef = null,
+  onFilmShowing,
 }) {
   const prefersReducedMotion = useReducedMotion();
   const isPhone = useMediaQuery("(max-width: 767px)");
@@ -222,6 +226,7 @@ export default function VideoAsset({
       return;
     }
 
+    onFilmShowing?.(false);
     setPlaybackFailed(true);
     onPlaybackFailed?.(true);
   };
@@ -322,6 +327,11 @@ export default function VideoAsset({
           aria-hidden="true"
           tabIndex={-1}
 
+          // `playing` is the only event that means pixels are on screen. The
+          // hero dresses itself off this, never off the file's existence.
+          onPlaying={() => onFilmShowing?.(true)}
+          onPause={() => onFilmShowing?.(false)}
+          onEmptied={() => onFilmShowing?.(false)}
           onError={handleMediaError}
         >
           {sources.map((source) => (
