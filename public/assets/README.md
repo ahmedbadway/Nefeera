@@ -141,7 +141,25 @@ ffmpeg -i source.mp4 \
   hero.mp4
 ```
 
-### 2. Still frame — `hero-poster.webp`
+### 2. Share card — `hero-share.jpg`
+
+The image WhatsApp and Facebook show when someone sends the site's link. It is
+the **one JPEG** on a site that is otherwise all WebP, because WhatsApp link
+previews do not render WebP reliably — and WhatsApp is where this business's
+enquiries come from. 1200 x 630 is the size both platforms want.
+
+```bash
+ffmpeg -ss 00:00:06 -i hero.mp4 -frames:v 1 \
+  -vf "crop=464:243,scale=1200:630:flags=lanczos" \
+  -q:v 4 hero-share.jpg
+```
+
+The crop numbers assume the current film's 464 x 832 frame. For a different
+film, crop a 1.91:1 band out of the middle of ITS frame instead, then scale
+that to 1200 x 630. If the link preview stops showing a picture after a change
+here, that meta tag in `index.html` is the first place to look.
+
+### 3. Still frame — `hero-poster.webp`
 
 **Do not skip this one.** It is the image the browser paints before a single
 byte of video has been decoded, and it is what the whole page rests on whenever
@@ -208,6 +226,10 @@ that will not display. Convert it properly.
 
 That includes the video still frame, `hero-poster.webp` — it is displayed by
 the browser like any other image, so it follows the same rule.
+
+The one exception is the share card, `hero-share.jpg`, which stays a JPEG:
+it is never displayed on the site itself, only by WhatsApp and Facebook when
+the link is shared, and those do not render WebP reliably.
 
 ---
 

@@ -65,7 +65,7 @@ function expectedTypePrefix(path) {
  *   type answered; "missing" when the server said so; "unknown" when the
  *   question could not be put to the server at all.
  */
-export function probeAsset(path) {
+function probeAsset(path) {
   if (!path) return Promise.resolve("missing");
   if (probeCache.has(path)) return probeCache.get(path);
 
@@ -118,7 +118,7 @@ export function probeAsset(path) {
  * @param {string[]} paths
  * @returns {Promise<string|null>}
  */
-export async function probeFirstAvailable(paths) {
+async function probeFirstAvailable(paths) {
   for (const path of paths) {
     // Sequential on purpose: the common case is that none of them exist, and
     // this keeps us from firing several requests when the first would answer it.

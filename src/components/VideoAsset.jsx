@@ -51,9 +51,12 @@ const LOAD_WATCHDOG_MS = [2500, 6500];
  * @param {string} props.src        The video path. One file, all widths.
  * @param {string} props.poster     Still image path, shown before playback.
  * @param {string} [props.label]    Placeholder label, e.g. "Background film".
- * @param {string} [props.ratio]    Aspect-ratio box. Omit when `fill` is set.
- * @param {boolean} [props.fill]    Fill the nearest positioned parent instead of boxing itself.
- * @param {string} [props.className] Classes for the wrapper.
+ *
+ * The slot always fills its positioned parent. It used to take `ratio`,
+ * `className`, and a `fill` toggle for a boxed variant, but the film is the
+ * only thing that has ever used this component and it always filled — so the
+ * boxed path was unreachable code pretending to be an option.
+ *
  * @param {string} [props.objectPositionClass] Responsive object-position classes
  *   applied to the video and poster, e.g. "object-[35%_15%] md:object-center".
  * @param {(failed: boolean) => void} [props.onPlaybackFailed]
@@ -69,9 +72,6 @@ export default function VideoAsset({
   src,
   poster,
   label = "Background film",
-  ratio,
-  fill = false,
-  className = "",
   objectPositionClass = "object-center",
   onPlaybackFailed,
   videoRef = null,
@@ -246,39 +246,32 @@ export default function VideoAsset({
       buildPlaceholderSvg({
         width: spec.w,
         height: spec.h,
-        ratio: ratio || spec.ratio || "16/9",
+        ratio: spec.ratio || "16/9",
         label: resolvedLabel,
         requirement,
         // No shimmer under reduced motion — that is movement too.
         animated: !prefersReducedMotion,
         idSeed: getAssetFilename(src) || "video",
-        // Full-bleed slots draw the warm-white field only. The artwork is cropped
-        // unpredictably by `slice` at this size, so the label is rendered as
-        // positioned HTML below instead. See PlaceholderSvg.js.
-        showLockup: !fill,
+        // The warm-white field only: the artwork is cropped unpredictably by
+        // `slice` at this size, so the label is rendered as positioned HTML
+        // below instead. See PlaceholderSvg.js.
+        showLockup: false,
       }),
     [
       spec.w,
       spec.h,
       spec.ratio,
-      ratio,
       resolvedLabel,
       requirement,
       src,
       prefersReducedMotion,
-      fill,
     ]
   );
 
   const mediaPresent = showVideo || showPoster;
 
-  const wrapperStyle = fill ? undefined : { aspectRatio: ratio || spec.ratio || "16/9" };
-  const wrapperClass = `${
-    fill ? "absolute" : "relative"
-  } inset-0 overflow-hidden bg-sage-mist [&>div>svg]:block [&>div>svg]:h-full [&>div>svg]:w-full ${className}`;
-
   return (
-    <div className={wrapperClass} style={wrapperStyle}>
+    <div className="absolute inset-0 overflow-hidden bg-sage-mist [&>div>svg]:block [&>div>svg]:h-full [&>div>svg]:w-full">
       {/* Placeholder. Stays mounted underneath so it also covers the gap before
           the first video frame paints. */}
       <div
@@ -287,14 +280,14 @@ export default function VideoAsset({
         dangerouslySetInnerHTML={{ __html: placeholderMarkup }}
       />
 
-      {/* Requirement label for full-bleed slots, as HTML rather than SVG so it
-          cannot be cropped away and cannot land on top of the hero copy. Sits
-          below the header at the inline end, clear of everything else. */}
+      {/* Requirement label as HTML rather than SVG so it cannot be cropped
+          away and cannot land on top of the hero copy. Sits below the header
+          at the inline end, clear of everything else. */}
       {/* Bottom-end on phones, top-end from 640px up. On a 375px hero there is
           only ~50px between the header and the first line of copy, so the top
           slot does not exist at that width; the bottom is clear there because
           the scroll hint is hidden on small screens. */}
-      {fill && !mediaPresent ? (
+      {!mediaPresent ? (
         <div
           className="pointer-events-none absolute bottom-6 end-[var(--gutter)] max-w-[min(18rem,68vw)] border border-champagne-deep/50 bg-warm-white/70 px-4 py-3 text-end backdrop-blur-[2px] sm:bottom-auto sm:top-28"
           role="img"
