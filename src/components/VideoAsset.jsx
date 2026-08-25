@@ -16,11 +16,6 @@ const MAX_MEDIA_RETRIES = 2;
 // quietly do nothing with it, and nothing else in the page will notice.
 const LOAD_WATCHDOG_MS = [2500, 6500];
 
-// Where to seek to force a paint when the film is not allowed to move. Not 0:
-// seeking to the time the element is already at is a no-op, and it is the seek
-// completing that puts a frame on screen.
-const STILL_FRAME_TIME = 0.05;
-
 /**
  * The background-video slot, used for the film behind the site.
  *
@@ -105,21 +100,27 @@ export default function VideoAsset({
   const videoAvailable = Boolean(src) && !playbackFailed;
   const posterAvailable = Boolean(poster) && !posterFailed;
 
-  // The film loops continuously, with one exception: prefers-reduced-motion.
-  // A visitor who has asked their OS to stop moving interfaces is not asking
-  // about this site in particular, and a film running behind every section is
-  // precisely what that setting exists to refuse. They get a still frame
-  // instead. That is also what keeps WCAG 2.2.2 satisfied now that there is no
-  // pause button: the mechanism to stop the motion is the OS preference.
+  // THE FILM RUNS EVERYWHERE, prefers-reduced-motion INCLUDED.
   //
-  // A STILL FRAME MEANS A FRAME. A paused <video> that has never fetched
-  // anything, with no poster file uploaded, paints absolutely nothing. Reduced
-  // motion asks for stillness, not for a blank rectangle where the film should
-  // be — so that path loads the file and seeks a frame onto the screen, and
-  // simply never plays it.
+  // This is the client's standing decision, and it is recorded in
+  // scripts/VerifyAssets.mjs: the film is a decorative background, and WCAG
+  // 2.2.2 asks for a way to STOP motion that runs over five seconds, not for
+  // it never to start. Reduced motion was briefly treated here as that stop
+  // mechanism — the element loaded but was held on a single seeked frame
+  // instead of playing.
+  //
+  // That silently reinstated a block the client had already removed, and it
+  // was invisible from the outside: a visitor with the iOS Reduce Motion
+  // setting on saw a page whose film simply never ran, with no error and
+  // nothing to react to, which is indistinguishable from the film being
+  // broken. It is a widely enabled setting, so "the video does not work on my
+  // phone" was, for that visitor, exactly true.
+  //
+  // Everything else on the page still honours the preference — the placeholder
+  // shimmer below, the Reveal animations, the parallax, the CSS guard in
+  // Global.css. Only the background film is exempt.
   const showPoster = posterAvailable && !videoAvailable;
   const showVideo = videoAvailable;
-  const autoPlayVideo = showVideo && !prefersReducedMotion;
 
   // GETTING A PICTURE ON SCREEN, EVERYWHERE.
   //
@@ -139,8 +140,6 @@ export default function VideoAsset({
   //     the failure is completely silent — no error, no event, nothing to
   //     react to. Only asking again fixes it, so a watchdog does exactly that
   //     on a timer as well as on the first gesture.
-  //  4. Reduced motion: no play() is coming, so a frame has to be seeked into
-  //     place deliberately.
   useEffect(() => {
     const video = resolvedVideoRef.current;
     if (!video || !showVideo) return undefined;
@@ -173,23 +172,6 @@ export default function VideoAsset({
       }
     };
 
-    // Reduced motion: put one frame up and stop. A seek is what forces the
-    // paint — merely having data loaded does not.
-    const showStillFrame = () => {
-      if (video.readyState < 1) return;
-      if (video.currentTime >= STILL_FRAME_TIME) {
-        unbind();
-        return;
-      }
-      try {
-        video.currentTime = STILL_FRAME_TIME;
-      } catch {
-        // Not seekable yet; a later readiness event tries again.
-      }
-    };
-
-    const settle = autoPlayVideo ? attemptPlay : showStillFrame;
-
     // The one move that turns iOS's silent refusal around. Calling play() on an
     // element that fetched nothing just stalls; load() is what asks for bytes.
     function kick() {
@@ -200,18 +182,18 @@ export default function VideoAsset({
           // Nothing to recover from; the attempt below still runs.
         }
       }
-      settle();
+      attemptPlay();
     }
 
-    settle();
+    attemptPlay();
 
     GESTURES.forEach((type) => window.addEventListener(type, kick, { passive: true }));
-    document.addEventListener("visibilitychange", settle);
+    document.addEventListener("visibilitychange", attemptPlay);
     // A file that arrives slowly is ready long after mount, and on a phone
     // connection that gap is where the first attempt quietly gets skipped.
-    video.addEventListener("canplay", settle);
-    video.addEventListener("loadeddata", settle);
-    video.addEventListener("loadedmetadata", settle);
+    video.addEventListener("canplay", attemptPlay);
+    video.addEventListener("loadeddata", attemptPlay);
+    video.addEventListener("loadedmetadata", attemptPlay);
 
     // The watchdog. Nothing above fires when iOS decides not to fetch at all,
     // because "did nothing" raises no event — so this is the only thing that
@@ -220,12 +202,12 @@ export default function VideoAsset({
 
     return () => {
       unbind();
-      document.removeEventListener("visibilitychange", settle);
-      video.removeEventListener("canplay", settle);
-      video.removeEventListener("loadeddata", settle);
-      video.removeEventListener("loadedmetadata", settle);
+      document.removeEventListener("visibilitychange", attemptPlay);
+      video.removeEventListener("canplay", attemptPlay);
+      video.removeEventListener("loadeddata", attemptPlay);
+      video.removeEventListener("loadedmetadata", attemptPlay);
     };
-  }, [showVideo, autoPlayVideo, resolvedVideoRef, src]);
+  }, [showVideo, resolvedVideoRef, src]);
 
   // GIVING UP IS A LAST RESORT, NOT A FIRST RESPONSE.
   //
@@ -336,9 +318,9 @@ export default function VideoAsset({
       {showVideo ? (
         <video
           className={`absolute inset-0 h-full w-full object-cover ${objectPositionClass}`}
-          autoPlay={autoPlayVideo}
+          autoPlay
           muted
-          loop={autoPlayVideo}
+          loop
           playsInline
           // "auto" rather than "metadata": when a browser refuses autoplay the
           // video sits paused, and a paused video with only metadata loaded can
@@ -353,13 +335,12 @@ export default function VideoAsset({
           // <source> is precisely the path that fails silently.
           src={resolveAssetPath(src)}
           // A DECODED FRAME is what means pixels are on screen — which is not
-          // the same as playing. `loadeddata` and `seeked` both mean a frame is
-          // up; a paused element keeps painting the one it has, so a pause is
-          // NOT the picture going away and must not be reported as one. Only
-          // `emptied` — the element genuinely holding nothing — is.
+          // the same as playing. `loadeddata` means a frame is up; a paused
+          // element keeps painting the one it has, so a pause is NOT the
+          // picture going away and must not be reported as one. Only `emptied`
+          // — the element genuinely holding nothing — is.
           onPlaying={() => onFilmShowing?.(true)}
           onLoadedData={() => onFilmShowing?.(true)}
-          onSeeked={() => onFilmShowing?.(true)}
           onEmptied={() => onFilmShowing?.(false)}
           onError={handleMediaError}
         />
