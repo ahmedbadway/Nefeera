@@ -19,9 +19,26 @@ import { resolveAssetPath } from "./ResolveAssetPath.js";
  * rather than a 404. Checking `res.ok` alone would report every missing asset
  * as present. So we also require the Content-Type to match what the extension
  * implies — an HTML body under a .mp4 request is a miss, not a hit.
+ *
+ * "MISSING" AND "COULD NOT TELL" ARE NOT THE SAME ANSWER.
+ * This used to collapse them: any thrown fetch — an offline moment, a captive
+ * portal, a carrier proxy that dislikes HEAD, a browser that declines the
+ * request on a metered connection — came back as `false`, exactly as if the
+ * server had said 404. For an <img> that is harmless. For the background film
+ * it was fatal: a probe that could not reach the server meant no <video>
+ * element was ever created, so a file that was sitting right there on the
+ * server could never get a chance to play, and nothing downstream could
+ * recover because there was nothing in the DOM to recover.
+ *
+ * So there are three answers now, and callers decide what an unknown is worth.
+ * A decorative logo treats it as absent (the drawn mark is a fine outcome).
+ * The film treats it as present and lets the media element be the judge — it
+ * is the only thing here that can actually load the bytes.
  */
 
-/** path -> Promise<boolean>. One probe per path per page load, shared by all callers. */
+/** @typedef {"present"|"missing"|"unknown"} AssetStatus */
+
+/** path -> Promise<AssetStatus>. One probe per path per page load, shared by all callers. */
 const probeCache = new Map();
 
 const TYPE_BY_EXTENSION = {
@@ -44,14 +61,16 @@ function expectedTypePrefix(path) {
 
 /**
  * @param {string} path Absolute path such as "/assets/video/hero.webm".
- * @returns {Promise<boolean>} true only if a real file of the right type is there.
+ * @returns {Promise<AssetStatus>} "present" only when a real file of the right
+ *   type answered; "missing" when the server said so; "unknown" when the
+ *   question could not be put to the server at all.
  */
 export function probeAsset(path) {
-  if (!path) return Promise.resolve(false);
+  if (!path) return Promise.resolve("missing");
   if (probeCache.has(path)) return probeCache.get(path);
 
   const request = (async () => {
-    if (typeof fetch !== "function") return false;
+    if (typeof fetch !== "function") return "unknown";
 
     try {
       // Cache keys and returned values stay logical; only the request itself is
@@ -61,21 +80,29 @@ export function probeAsset(path) {
         cache: "force-cache",
       });
 
-      if (!response.ok) return false;
+      // 404 and 410 are the server actually answering the question. Anything
+      // else in the failure range — 403 from a proxy, 429, a 5xx, a gateway
+      // timeout — says something went wrong on the way, not that the file is
+      // absent, and must not be reported as absence.
+      if (!response.ok) {
+        return response.status === 404 || response.status === 410 ? "missing" : "unknown";
+      }
 
       const expected = expectedTypePrefix(path);
-      if (!expected) return true;
+      if (!expected) return "present";
 
       const contentType = (response.headers.get("content-type") || "").toLowerCase();
 
       // No Content-Type at all: trust the 200. Some static hosts omit it on HEAD.
-      if (!contentType) return true;
+      if (!contentType) return "present";
 
-      return contentType.startsWith(expected);
+      // An HTML body under a .mp4 request is the SPA-rewrite trap: a real miss.
+      return contentType.startsWith(expected) ? "present" : "missing";
     } catch {
-      // Network error, blocked request, or an offline browser. Treat as missing
-      // so the page falls back to a placeholder rather than a broken element.
-      return false;
+      // Network error, a blocked or rewritten request, an offline browser. We
+      // learned nothing about the file, and saying "missing" here is what used
+      // to stop the film from ever mounting.
+      return "unknown";
     }
   })();
 
@@ -84,8 +111,9 @@ export function probeAsset(path) {
 }
 
 /**
- * Probe several paths in order and resolve with the first one that exists.
- * Used by Logo to prefer logo.svg, then logo.png, then the drawn mark.
+ * Probe several paths in order and resolve with the first one that is
+ * definitely there. Used by Logo to prefer logo.svg, then logo.png, then the
+ * drawn mark — a decorative choice, so an unknown falls through to the mark.
  *
  * @param {string[]} paths
  * @returns {Promise<string|null>}
@@ -94,7 +122,7 @@ export async function probeFirstAvailable(paths) {
   for (const path of paths) {
     // Sequential on purpose: the common case is that none of them exist, and
     // this keeps us from firing several requests when the first would answer it.
-    if (await probeAsset(path)) return path;
+    if ((await probeAsset(path)) === "present") return path;
   }
   return null;
 }
@@ -102,7 +130,7 @@ export async function probeFirstAvailable(paths) {
 /**
  * React hook wrapper around probeAsset.
  * @param {string} path
- * @returns {"pending"|"present"|"missing"}
+ * @returns {"pending"|"present"|"missing"|"unknown"}
  */
 export function useAssetExists(path) {
   const [status, setStatus] = useState("pending");
@@ -111,8 +139,8 @@ export function useAssetExists(path) {
     let active = true;
     setStatus("pending");
 
-    probeAsset(path).then((exists) => {
-      if (active) setStatus(exists ? "present" : "missing");
+    probeAsset(path).then((result) => {
+      if (active) setStatus(result);
     });
 
     return () => {

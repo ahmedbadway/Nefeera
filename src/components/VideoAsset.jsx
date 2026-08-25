@@ -13,23 +13,45 @@ const GESTURES = ["pointerdown", "touchstart", "keydown", "scroll"];
 // falls back to the placeholder.
 const MAX_MEDIA_RETRIES = 2;
 
+// How long to let the element sit at readyState 0 — having fetched literally
+// nothing — before asking it again. iOS can accept `preload="auto"` and then
+// quietly do nothing with it, and nothing else in the page will notice.
+const LOAD_WATCHDOG_MS = [2500, 6500];
+
+// Where to seek to force a paint when the film is not allowed to move. Not 0:
+// seeking to the time the element is already at is a no-op, and it is the seek
+// completing that puts a frame on screen.
+const STILL_FRAME_TIME = 0.05;
+
 /**
  * A swappable background-video slot, used for the hero.
  *
- * WHY THIS PROBES INSTEAD OF USING onError:
- * The requirement is that a missing video renders NO <video> element at all —
- * never a broken player, never browser chrome, not even for a frame. A <video>
- * whose <source> children all 404 does show a blank box before anything fires,
- * and per-<source> error events are unreliable across browsers. So we ask the
- * server first (see utils/AssetProbe.js) and only mount a <video> once we know
- * a real video file is there.
+ * THE PROBE ADVISES, IT NO LONGER DECIDES.
+ * The requirement is that a MISSING video renders no <video> element — never a
+ * broken player, never browser chrome. That is still true, and the probe (see
+ * utils/AssetProbe.js) is still what tells us which optional cuts exist so the
+ * right one is offered.
+ *
+ * But it used to be a gate: nothing mounted until the probe came back positive,
+ * which quietly made a HEAD request a prerequisite for playing a video. Any
+ * device where that request did not come back clean — an offline blink, a
+ * carrier proxy, a browser economising on a metered connection — got no
+ * <video> element at all, so the file on the server never had a chance to
+ * prove itself and no amount of playback hardening downstream could help,
+ * because there was nothing in the DOM to harden. That is the bug this file
+ * had, and it is why "the file is fine and nothing plays" was possible.
+ *
+ * So the element now mounts on the primary file immediately and the probe only
+ * refines it afterwards. The media element is the one thing here that can
+ * actually fetch the bytes, so it gets to be the judge; `handleMediaError`
+ * below is the safety net that retires the slot if it truly cannot play.
  *
  * WHAT RENDERS WHEN:
- *   probe pending        -> shimmer placeholder (the same thing it becomes if
- *                           the files are missing, so there is no content flash)
- *   no video files       -> the poster if one exists, else the shimmer
- *                           placeholder. No <video> in the DOM either way.
- *   video files present  -> <video>, looping continuously
+ *   first paint          -> <video> on the primary file, plus the placeholder
+ *                           underneath it until a frame decodes
+ *   file confirmed gone  -> the poster if one exists, else the placeholder,
+ *                           and the <video> leaves the DOM
+ *   anything else        -> <video>, looping continuously
  *
  * The film loops with no on-screen control at all — see the playback notes
  * below for how that is held up on iOS, and what prefers-reduced-motion does.
@@ -73,7 +95,7 @@ export default function VideoAsset({
   const prefersReducedMotion = useReducedMotion();
   const isPhone = useMediaQuery("(max-width: 767px)");
 
-  // null while probing; an object once we know what exists on the server.
+  // null while probing; a map of path -> "present"|"missing"|"unknown" after.
   const [available, setAvailable] = useState(null);
   const [playbackFailed, setPlaybackFailed] = useState(false);
   const [posterFailed, setPosterFailed] = useState(false);
@@ -89,8 +111,8 @@ export default function VideoAsset({
       probeAsset(desktopSrc),
       probeAsset(mobileSrc),
       probeAsset(poster),
-    ]).then(([webm, desktop, mobile, posterExists]) => {
-      if (active) setAvailable({ webm, desktop, mobile, poster: posterExists });
+    ]).then(([webm, desktop, mobile, posterStatus]) => {
+      if (active) setAvailable({ webm, desktop, mobile, poster: posterStatus });
     });
 
     return () => {
@@ -98,41 +120,61 @@ export default function VideoAsset({
     };
   }, [webmSrc, desktopSrc, mobileSrc, poster]);
 
-  // Build the <source> list from what actually exists, in preference order.
+  // Build the <source> list, in preference order.
+  //
+  // The asymmetry here is the point. An OPTIONAL cut — the WebM, the portrait
+  // phone file — has to be proven present before it is offered, because
+  // pointing the element at a file that is not there is how resource selection
+  // stalls. The PRIMARY file is the opposite: it is the one the site is
+  // guaranteed to ship, so it is offered from the first render and only a
+  // server that actually answered 404 takes it away again.
   const sources = useMemo(() => {
-    if (!available) return [];
+    const primary = desktopSrc ? [{ src: desktopSrc, type: "video/mp4" }] : [];
 
-    // Phones get the portrait crop when it exists; otherwise they fall back to
-    // the landscape files rather than showing a placeholder unnecessarily.
-    if (isPhone && available.mobile) {
+    // Nothing known yet, and waiting to find out is exactly what used to cost
+    // us the whole film. Start loading.
+    if (!available) return primary;
+
+    // Phones get the portrait crop when it genuinely exists; otherwise they
+    // fall back to the landscape file, framed by objectPositionClass.
+    if (isPhone && available.mobile === "present") {
       return [{ src: mobileSrc, type: "video/mp4" }];
     }
 
     const list = [];
-    if (available.webm) list.push({ src: webmSrc, type: "video/webm" });
-    if (available.desktop) list.push({ src: desktopSrc, type: "video/mp4" });
-    if (list.length === 0 && available.mobile) {
+    if (available.webm === "present") list.push({ src: webmSrc, type: "video/webm" });
+    if (desktopSrc && available.desktop !== "missing") {
+      list.push({ src: desktopSrc, type: "video/mp4" });
+    }
+    if (list.length === 0 && mobileSrc && available.mobile !== "missing") {
       list.push({ src: mobileSrc, type: "video/mp4" });
     }
     return list;
   }, [available, isPhone, webmSrc, desktopSrc, mobileSrc]);
 
   const videoAvailable = sources.length > 0 && !playbackFailed;
-  const posterAvailable = Boolean(available?.poster) && !posterFailed;
+  const posterAvailable = available?.poster === "present" && !posterFailed;
 
   // The film loops continuously, with one exception: prefers-reduced-motion.
   // A visitor who has asked their OS to stop moving interfaces is not asking
   // about this site in particular, and a film running behind every section is
-  // precisely what that setting exists to refuse. They get a still first frame
+  // precisely what that setting exists to refuse. They get a still frame
   // instead. That is also what keeps WCAG 2.2.2 satisfied now that there is no
   // pause button: the mechanism to stop the motion is the OS preference.
+  //
+  // A STILL FRAME MEANS A FRAME. This was the second way to end up looking at
+  // nothing: the element mounted, autoplay was correctly withheld, and with no
+  // poster file uploaded a paused <video> that has never fetched anything
+  // paints absolutely nothing. Reduced motion asks for stillness, not for a
+  // blank rectangle where the film should be — so that path now loads the file
+  // and seeks a frame onto the screen, and simply never plays it.
   const showPoster = posterAvailable && !videoAvailable;
   const showVideo = videoAvailable;
   const autoPlayVideo = showVideo && !prefersReducedMotion;
 
-  // KEEPING IT PLAYING, EVERYWHERE.
+  // GETTING A PICTURE ON SCREEN, EVERYWHERE.
   //
-  // Three separate things stop a background film, and there is no button to
+  // Four separate things leave this element blank, and there is no button to
   // fall back on any more, so each one is handled:
   //
   //  1. iOS reads the `muted` ATTRIBUTE to decide whether autoplay is allowed,
@@ -142,10 +184,14 @@ export default function VideoAsset({
   //  2. iOS in Low Power Mode refuses autoplay outright, no matter the markup.
   //     Nothing can override that, but the refusal is lifted by the visitor's
   //     first real gesture — so every tap, click, keypress, or scroll retries
-  //     playback until one actually succeeds.
-  //  3. Returning to a backgrounded tab can leave the element paused, and a
-  //     file that arrives late can miss its own autoplay window, so visibility
-  //     changes and readiness events retry too.
+  //     until one actually succeeds.
+  //  3. On a cellular connection iOS downloads NOTHING up front, `preload`
+  //     included: readyState stays 0, play() has no data to start from, and
+  //     the failure is completely silent — no error, no event, nothing to
+  //     react to. Only asking again fixes it, so a watchdog does exactly that
+  //     on a timer as well as on the first gesture.
+  //  4. Reduced motion: no play() is coming, so a frame has to be seeked into
+  //     place deliberately.
   useEffect(() => {
     const video = resolvedVideoRef.current;
     if (!video || !showVideo) return undefined;
@@ -154,19 +200,21 @@ export default function VideoAsset({
     video.defaultMuted = true;
     video.setAttribute("muted", "");
 
-    if (!autoPlayVideo) return undefined;
-
     let unbound = false;
+    const timers = [];
+
     const unbind = () => {
       if (unbound) return;
       unbound = true;
-      GESTURES.forEach((type) => window.removeEventListener(type, onGesture));
+      timers.forEach((id) => window.clearTimeout(id));
+      timers.length = 0;
+      GESTURES.forEach((type) => window.removeEventListener(type, kick));
     };
 
-    // Only stop listening once a play() actually RESOLVES. play() is async, so
-    // unbinding right after calling it — which is what this did at first —
-    // threw away every remaining chance the moment one attempt was refused,
-    // and a refused first attempt is the normal case on iOS.
+    // Only stop once a play() actually RESOLVES. play() is async, so unbinding
+    // right after calling it — which is what this did at first — threw away
+    // every remaining chance the moment one attempt was refused, and a refused
+    // first attempt is the normal case on iOS.
     const attemptPlay = () => {
       if (!video.paused) return;
       const started = video.play();
@@ -177,38 +225,57 @@ export default function VideoAsset({
       }
     };
 
-    // A gesture is the one moment iOS will fetch video it has refused to fetch
-    // on its own — on a cellular connection or in Low Power Mode it downloads
-    // NOTHING up front, `preload` included, so readyState sits at 0 and play()
-    // has no data to start from. Kicking load() inside the gesture is what
-    // turns the refusal around; calling play() alone just stalls.
-    function onGesture() {
+    // Reduced motion: put one frame up and stop. A seek is what forces the
+    // paint — merely having data loaded does not.
+    const showStillFrame = () => {
+      if (video.readyState < 1) return;
+      if (video.currentTime >= STILL_FRAME_TIME) {
+        unbind();
+        return;
+      }
+      try {
+        video.currentTime = STILL_FRAME_TIME;
+      } catch {
+        // Not seekable yet; a later readiness event tries again.
+      }
+    };
+
+    const settle = autoPlayVideo ? attemptPlay : showStillFrame;
+
+    // The one move that turns iOS's silent refusal around. Calling play() on an
+    // element that fetched nothing just stalls; load() is what asks for bytes.
+    function kick() {
       if (video.readyState === 0) {
         try {
           video.load();
         } catch {
-          // Nothing to recover from; the play attempt below still runs.
+          // Nothing to recover from; the attempt below still runs.
         }
       }
-      attemptPlay();
+      settle();
     }
 
-    attemptPlay();
+    settle();
 
-    GESTURES.forEach((type) =>
-      window.addEventListener(type, onGesture, { passive: true })
-    );
-    document.addEventListener("visibilitychange", attemptPlay);
+    GESTURES.forEach((type) => window.addEventListener(type, kick, { passive: true }));
+    document.addEventListener("visibilitychange", settle);
     // A file that arrives slowly is ready long after mount, and on a phone
-    // connection that gap is where autoplay quietly gets skipped.
-    video.addEventListener("canplay", attemptPlay);
-    video.addEventListener("loadeddata", attemptPlay);
+    // connection that gap is where the first attempt quietly gets skipped.
+    video.addEventListener("canplay", settle);
+    video.addEventListener("loadeddata", settle);
+    video.addEventListener("loadedmetadata", settle);
+
+    // The watchdog. Nothing above fires when iOS decides not to fetch at all,
+    // because "did nothing" raises no event — so this is the only thing that
+    // catches that case, and it is the case a visitor on 4G actually hits.
+    LOAD_WATCHDOG_MS.forEach((delay) => timers.push(window.setTimeout(kick, delay)));
 
     return () => {
       unbind();
-      document.removeEventListener("visibilitychange", attemptPlay);
-      video.removeEventListener("canplay", attemptPlay);
-      video.removeEventListener("loadeddata", attemptPlay);
+      document.removeEventListener("visibilitychange", settle);
+      video.removeEventListener("canplay", settle);
+      video.removeEventListener("loadeddata", settle);
+      video.removeEventListener("loadedmetadata", settle);
     };
   }, [showVideo, autoPlayVideo, resolvedVideoRef, sources]);
 
@@ -334,7 +401,7 @@ export default function VideoAsset({
           // video sits paused, and a paused video with only metadata loaded can
           // paint nothing at all. This guarantees there is a frame to show.
           preload="auto"
-          poster={available?.poster ? resolveAssetPath(poster) : undefined}
+          poster={posterAvailable ? resolveAssetPath(poster) : undefined}
           ref={resolvedVideoRef}
           aria-hidden="true"
           tabIndex={-1}
@@ -346,10 +413,16 @@ export default function VideoAsset({
           // candidate the element list buys nothing anyway.
           src={sources.length === 1 ? resolveAssetPath(sources[0].src) : undefined}
 
-          // `playing` is the only event that means pixels are on screen. The
-          // hero dresses itself off this, never off the file's existence.
+          // A DECODED FRAME is what means pixels are on screen — which is not
+          // the same as playing, and getting that distinction wrong is what
+          // made a reduced-motion visitor's hero dress itself for footage it
+          // was never going to be shown. `loadeddata` and `seeked` both mean a
+          // frame is up; a paused element keeps painting the one it has, so a
+          // pause is NOT the picture going away and must not be reported as
+          // one. Only `emptied` — the element genuinely holding nothing — is.
           onPlaying={() => onFilmShowing?.(true)}
-          onPause={() => onFilmShowing?.(false)}
+          onLoadedData={() => onFilmShowing?.(true)}
+          onSeeked={() => onFilmShowing?.(true)}
           onEmptied={() => onFilmShowing?.(false)}
           onError={handleMediaError}
         >
