@@ -1,15 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Hero Poster placeholder. Required file: hero-poster.jpg — 1920×1080">
-  <rect width="1920" height="1080" fill="#E7EDE2" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 464 832" width="464" height="832" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Hero Poster placeholder. Required file: hero-poster.webp — 464×832">
+  <rect width="464" height="832" fill="#E7EDE2" />
   
-  <rect x="21.60" y="21.60" width="1876.80" height="1036.80" fill="none" stroke="#7A683F" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.55" />
+  <rect x="9.28" y="9.28" width="445.44" height="813.44" fill="none" stroke="#7A683F" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.55" />
   
-    <g transform="translate(830.40 275.40) scale(2.1600)" fill="none" stroke="#7A683F" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+    <g transform="translate(176.32 302.32) scale(0.9280)" fill="none" stroke="#7A683F" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
       <path d="M12 18 C12 52, 30 66, 60 66 C90 66, 108 52, 108 18" stroke-width="5" />
       <path d="M108 18 C108 10, 102 5, 94 7" stroke-width="3.2" opacity="0.7" />
       <circle cx="60" cy="6" r="4.5" fill="#7A683F" stroke="none" />
     </g>
-  <text x="960.00" y="529.20" text-anchor="middle" font-family="Italiana, Georgia, serif" font-size="62.64" letter-spacing="11.28" fill="#252E28" opacity="0.9">NEFEERA</text>
-  <line x1="798.00" y1="588.60" x2="1122.00" y2="588.60" stroke="#7A683F" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.7" />
-  <text x="960.00" y="680.40" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="47.52" letter-spacing="4.75" fill="#252E28">Hero Poster</text>
-  <text x="960.00" y="748.12" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="41.04" fill="#5A665C">hero-poster.jpg — 1920×1080</text>
+  <text x="232.00" y="411.36" text-anchor="middle" font-family="Italiana, Georgia, serif" font-size="26.91" letter-spacing="4.84" fill="#252E28" opacity="0.9">NEFEERA</text>
+  <line x1="162.40" y1="436.88" x2="301.60" y2="436.88" stroke="#7A683F" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.7" />
+  <text x="232.00" y="476.32" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="20.42" letter-spacing="2.04" fill="#252E28">Hero Poster</text>
+  <text x="232.00" y="505.41" text-anchor="middle" font-family="Outfit, system-ui, sans-serif" font-size="17.63" fill="#5A665C">hero-poster.webp — 464×832</text>
 </svg>

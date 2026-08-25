@@ -68,9 +68,17 @@ export function useHeroMedia() {
   const showing = useSyncExternalStore(subscribe, getFilmIsShowing, getFilmIsShowing);
   const posterStatus = useAssetExists(images.heroPoster);
 
-  // A poster counts too: it is a real dark still, and it is what visitors with
-  // reduced motion see in place of the film.
-  const hasDarkMedia = showing || posterStatus === "present";
+  // A poster counts too: it is a real dark still, painted by the element
+  // before any video decodes, and it is what visitors with reduced motion see
+  // in place of the film.
+  //
+  // "unknown" counts as present here — deliberately. An unknown is a probe that
+  // could not reach the server, not a server saying the file is gone, and the
+  // element will have painted the poster regardless. Dressing the hero light
+  // over a poster that IS on screen puts pale type on a photograph, which is
+  // the one outcome here that is actually unreadable. "pending" still counts as
+  // absent, so the page opens light and crossfades once the answer arrives.
+  const hasDarkMedia = showing || posterStatus === "present" || posterStatus === "unknown";
 
   return { hasDarkMedia };
 }

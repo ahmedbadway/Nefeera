@@ -1,6 +1,8 @@
+import { useRef } from "react";
 import { useContent } from "../utils/UseLanguage.js";
 import { reportFilmShowing, reportHeroPlaybackFailed } from "../utils/UseHeroMedia.js";
 import VideoAsset from "./VideoAsset.jsx";
+import VideoDiagnostics from "./VideoDiagnostics.jsx";
 
 /**
  * The film behind the whole site.
@@ -31,6 +33,9 @@ import VideoAsset from "./VideoAsset.jsx";
  */
 export default function FixedVideoBackdrop() {
   const { assets } = useContent();
+  // Held here rather than inside VideoAsset so the diagnostics panel can read
+  // the same element the player is driving. See VideoDiagnostics.jsx.
+  const videoRef = useRef(null);
 
   return (
     // No transform on this layer. It carried a translateZ(0) compositing hint,
@@ -45,9 +50,13 @@ export default function FixedVideoBackdrop() {
         src={assets.video.hero}
         poster={assets.images.heroPoster}
         label="Background film"
+        videoRef={videoRef}
         onFilmShowing={reportFilmShowing}
         onPlaybackFailed={reportHeroPlaybackFailed}
       />
+
+      {/* Renders only with ?debug=video in the URL. */}
+      <VideoDiagnostics videoRef={videoRef} src={assets.video.hero} />
 
       {/* The veil. Plain color + one cheap gradient that lifts the nav and
           footer zones a touch — no filters on this layer, ever. */}

@@ -244,10 +244,19 @@
 
 /* Users who ask the OS for reduced transparency get near-opaque panels and no
    blur at all. This sits on top of the @supports fallback above, not instead
-   of it — support for the media query itself is still uneven. */
+   of it — support for the media query itself is still uneven.
+
+   THE VEIL STAYS READABLE THROUGH, THOUGH. It used to go to 0.9 here, which
+   washed the film out almost completely and left the page looking like flat
+   cream with no glass and no picture — indistinguishable from the film being
+   broken, and iOS's Reduce Transparency is a commonly enabled setting. The
+   panels above are what carry text contrast in this mode (they are 0.95
+   opaque), so the veil does not have to do that job as well: 0.55 keeps the
+   raw footage in the gaps clearly visible while the reading surfaces stay
+   solid, which is what the setting is actually asking for. */
 @media (prefers-reduced-transparency: reduce) {
   :root {
-    --backdrop-veil: 0.9;
+    --backdrop-veil: 0.55;
   }
 
   .glass,
