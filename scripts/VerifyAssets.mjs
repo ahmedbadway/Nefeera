@@ -498,22 +498,34 @@ async function run() {
     await scrollThrough(rmPage);
     await rmPage.waitForTimeout(700);
 
-    // The hero film is exempt from prefers-reduced-motion by client decision —
-    // it is a decorative background, and WCAG 2.2.2 asks for a way to stop it
-    // rather than for it never to start. So what has to hold here is that the
-    // control EXISTS, not that the video is stopped.
+    // The background film is exempt from prefers-reduced-motion by client
+    // decision — it is decoration, and WCAG 2.2.2 asks for a way to stop
+    // motion rather than for it never to start. This check is what stops that
+    // decision being reversed by accident, which is exactly what happened
+    // once: the element was left loaded but held on a single seeked frame, so
+    // every visitor with the setting on got a film that never ran, with no
+    // error and nothing on screen to explain it.
+    //
+    // The pause control this used to look for was removed by the same client
+    // decision, so asserting its presence tested nothing. What has to hold is
+    // that the film is PLAYING: not paused, and past the first frame.
     const rmVideo = await rmPage.evaluate(() => {
-      const videos = [...document.querySelectorAll("video")];
-      const control = document.querySelector("#hero button");
+      const video = document.querySelector("video");
+      if (!video) return { present: false };
       return {
-        count: videos.length,
-        hasPauseControl: Boolean(control),
-        controlLabel: control ? control.textContent.trim() : null,
+        present: true,
+        paused: video.paused,
+        time: video.currentTime,
+        // A browser without the codec retires the element instead; that is a
+        // build-environment fact, not a regression in this behaviour.
+        canPlay: video.canPlayType('video/mp4; codecs="avc1.42E01E"'),
       };
     });
     check(
-      rmVideo.count === 0 || rmVideo.hasPauseControl,
-      `hero film has a pause control whenever it is present (${rmVideo.count} video(s), control: ${rmVideo.controlLabel || "none"})`
+      !rmVideo.present || !rmVideo.canPlay || !rmVideo.paused,
+      `background film still plays under prefers-reduced-motion (${
+        rmVideo.present ? `paused: ${rmVideo.paused}, t: ${rmVideo.time}` : "element retired"
+      })`
     );
 
     // Everything else must still honour the setting.
