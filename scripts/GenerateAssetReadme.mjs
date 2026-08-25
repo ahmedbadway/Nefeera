@@ -161,20 +161,17 @@ Two separate things to check:
    A vertical clip used as a full-screen desktop background can only ever show
    its middle strip — roughly a third of the height — because the rest falls
    outside a wide frame. That is cropping, not blur, and a bigger file will not
-   change it. If there is any horizontal footage, use it for
-   \`hero-desktop.mp4\` and keep the vertical clip for \`hero-mobile.mp4\`.
+   change it. If there is any horizontal footage, use it — a wide file suits
+   every screen, and phones are given a crop of it rather than a second file.
 
-The hero works with **any one** of these three files — you do not need all
-three. But each one earns its place:
+There is **one video file**, \`hero.mp4\`, and it plays on phones and
+desktops alike. There is deliberately no separate phone cut and no WebM: every
+extra candidate is one more file the browser has to choose between before it can
+start playing, and on a phone connection that choice is where playback used to
+stall. Phones frame the same file differently in CSS, which costs nothing.
 
-- \`hero.webm\` is the smallest file, and most browsers will pick it first.
-- \`hero-desktop.mp4\` is the universal fallback. If you only upload one file,
-  make it this one.
-- \`hero-mobile.mp4\` is a **portrait** crop for phones. Without it, phones show
-  the middle slice of the landscape video, which usually cuts people's heads off.
-
-Until at least one video is uploaded, the hero shows a still cream panel with a
-slow gold shimmer. **No broken video player ever appears.**
+Until the video is uploaded, the site shows a still cream panel with a slow gold
+shimmer. **No broken video player ever appears.**
 
 ---
 
@@ -186,7 +183,7 @@ give them this section.
 
 Start with your best footage as \`source.mov\` or \`source.mp4\` in the same folder.
 
-### 1. Desktop version — \`hero-desktop.mp4\`
+### 1. The film — \`hero.mp4\` (used on every device)
 
 \`\`\`bash
 ffmpeg -i source.mp4 \\
@@ -194,38 +191,17 @@ ffmpeg -i source.mp4 \\
   -c:v libx264 -profile:v high -crf 23 -preset slow \\
   -pix_fmt yuv420p -movflags +faststart \\
   -an \\
-  hero-desktop.mp4
+  hero.mp4
 \`\`\`
 
-### 2. Phone version — \`hero-mobile.mp4\` (portrait)
-
-\`\`\`bash
-ffmpeg -i source.mp4 \\
-  -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" \\
-  -c:v libx264 -profile:v high -crf 26 -preset slow \\
-  -pix_fmt yuv420p -movflags +faststart \\
-  -an \\
-  hero-mobile.mp4
-\`\`\`
-
-### 3. WebM version — \`hero.webm\` (smaller, modern browsers)
-
-\`\`\`bash
-ffmpeg -i source.mp4 \\
-  -vf "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080" \\
-  -c:v libvpx-vp9 -crf 34 -b:v 0 -row-mt 1 \\
-  -an \\
-  hero.webm
-\`\`\`
-
-### 4. Still frame — \`hero-poster.jpg\`
+### 2. Still frame — \`hero-poster.jpg\`
 
 This is the image shown before the video starts playing, and instead of the
 video for visitors who have switched off animations. Take it from four seconds
 into the video, or use any photo you prefer at 1920 × 1080.
 
 \`\`\`bash
-ffmpeg -ss 00:00:04 -i hero-desktop.mp4 -frames:v 1 -q:v 3 hero-poster.jpg
+ffmpeg -ss 00:00:04 -i hero.mp4 -frames:v 1 -q:v 3 hero-poster.jpg
 \`\`\`
 
 ### Notes for whoever cuts the video
@@ -236,7 +212,7 @@ ffmpeg -ss 00:00:04 -i hero-desktop.mp4 -frames:v 1 -q:v 3 hero-poster.jpg
 - **\`-movflags +faststart\` matters.** It moves the index to the front of the
   file so playback begins before the whole thing has downloaded. Without it the
   hero sits blank for several seconds on a slow connection.
-- **Check the file size afterwards.** If \`hero-desktop.mp4\` came out over 6 MB,
+- **Check the file size afterwards.** If \`hero.mp4\` came out over 6 MB,
   raise \`-crf 23\` to \`-crf 26\` and run it again. Higher number, smaller file,
   slightly softer picture.
 - Avoid fast motion and hard cuts. A slow, steady shot compresses far better and

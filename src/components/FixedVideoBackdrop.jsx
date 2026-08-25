@@ -40,9 +40,9 @@ export default function FixedVideoBackdrop() {
       <VideoAsset
         fill
         objectPositionClass="object-[35%_15%] md:object-center"
-        desktopSrc={assets.video.heroDesktop}
-        mobileSrc={assets.video.heroMobile}
-        webmSrc={assets.video.heroWebm}
+        // ONE path, phone and desktop alike. The only difference between the
+        // two is the crop above, which is CSS and cannot fail.
+        src={assets.video.hero}
         poster={assets.images.heroPoster}
         label="Background film"
         onFilmShowing={reportFilmShowing}

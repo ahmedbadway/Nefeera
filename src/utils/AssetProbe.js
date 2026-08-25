@@ -8,9 +8,9 @@ import { resolveAssetPath } from "./ResolveAssetPath.js";
  * For <img> we can render the element and let onError tell us it failed — that
  * is cheaper and needs no extra request. But two cases cannot work that way:
  *
- *   - VideoAsset must decide whether to render a <video> element AT ALL. A
- *     <video> with missing sources shows browser chrome / a broken player for a
- *     beat before any error fires, and <source> error events are unreliable.
+ *   - The background film needs to know whether a poster still exists before
+ *     deciding what to paint before the first frame decodes. (The VIDEO itself
+ *     is never gated on a probe any more — see VideoAsset.jsx.)
  *   - Logo must choose between logo.svg, logo.png, and the drawn fallback.
  *
  * THE HTML TRAP:
@@ -60,7 +60,7 @@ function expectedTypePrefix(path) {
 }
 
 /**
- * @param {string} path Absolute path such as "/assets/video/hero.webm".
+ * @param {string} path Absolute path such as "/assets/video/hero.mp4".
  * @returns {Promise<AssetStatus>} "present" only when a real file of the right
  *   type answered; "missing" when the server said so; "unknown" when the
  *   question could not be put to the server at all.

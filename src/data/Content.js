@@ -199,9 +199,23 @@ export const content = {
    */
   assets: {
     video: {
-      heroDesktop: "/assets/video/hero-desktop.mp4",
-      heroMobile: "/assets/video/hero-mobile.mp4",
-      heroWebm: "/assets/video/hero.webm",
+      /**
+       * ONE FILM, ONE PATH, EVERY DEVICE.
+       *
+       * There used to be three entries here — a landscape MP4, a portrait
+       * phone cut, and a WebM — and the player picked between them at runtime.
+       * That is what broke playback on phones: choosing a source means asking
+       * the server which files exist before anything can start, and every one
+       * of those questions is another thing that can fail on a phone
+       * connection. When the portrait cut was not uploaded, the phone spent
+       * its first seconds resolving that instead of playing the film that was
+       * sitting right there.
+       *
+       * So there is a single file now, served to a 375px phone and a 1440px
+       * desktop alike. The framing difference is handled in CSS with
+       * object-position, which costs nothing and cannot fail.
+       */
+      hero: "/assets/video/hero.mp4",
     },
     images: {
       heroPoster: "/assets/images/hero-poster.jpg",
@@ -254,34 +268,14 @@ content.contact.whatsappUrl = `https://wa.me/${content.contact.whatsapp}?text=${
  */
 export const assetSpecs = {
   // ---- Hero video ----------------------------------------------------------
-  "/assets/video/hero-desktop.mp4": {
+  "/assets/video/hero.mp4": {
     kind: "video",
     w: 1920,
     h: 1080,
     ratio: "16/9",
     maxKB: 6000,
     usedIn:
-      "Hero background video — desktop and tablet. Landscape. A vertical file works too, but wide screens will crop it to its middle band.",
-    alt: "Nefeera wedding film",
-  },
-  "/assets/video/hero-mobile.mp4": {
-    kind: "video",
-    w: 1080,
-    h: 1920,
-    ratio: "9/16",
-    maxKB: 4000,
-    usedIn:
-      "Hero background video — phones. Same shape as the desktop file while the source footage is vertical.",
-    alt: "Nefeera wedding film",
-  },
-  "/assets/video/hero.webm": {
-    kind: "video",
-    w: 1920,
-    h: 1080,
-    ratio: "16/9",
-    maxKB: 5000,
-    usedIn:
-      "Hero background video — smaller WebM version of the landscape file, used first when the browser supports it",
+      "Background film — the single video behind the whole site, on phones and desktop alike. Landscape. A vertical file works too; wide screens crop it to its middle band.",
     alt: "Nefeera wedding film",
   },
 
