@@ -90,7 +90,7 @@ stand-in for the real logo, not a replacement for it.
 
 | File name | Put it in | Exact size (pixels) | Shape | Max file size | Where it shows on the page |
 | --- | --- | --- | --- | --- | --- |
-| `hero-desktop.mp4` | `assets/video/` | 1920 × 1080 | Wide (16:9) | 6 MB | Background film — the single video behind the whole site, on phones and desktop alike. Landscape. A vertical file works too; wide screens crop it to its middle band. |
+| `hero.mp4` | `assets/video/` | 1920 × 1080 | Wide (16:9) | 6 MB | Background film — the single video behind the whole site, on phones and desktop alike. Landscape. A vertical file works too; wide screens crop it to its middle band. |
 
 ### If the hero video looks soft on a desktop screen
 
@@ -111,7 +111,7 @@ Two separate things to check:
    change it. If there is any horizontal footage, use it — a wide file suits
    every screen, and phones are given a crop of it rather than a second file.
 
-There is **one video file**, `hero-desktop.mp4`, and it plays on phones and
+There is **one video file**, `hero.mp4`, and it plays on phones and
 desktops alike. There is deliberately no separate phone cut and no WebM: every
 extra candidate is one more file the browser has to choose between before it can
 start playing, and on a phone connection that choice is where playback used to
@@ -130,7 +130,7 @@ give them this section.
 
 Start with your best footage as `source.mov` or `source.mp4` in the same folder.
 
-### 1. The film — `hero-desktop.mp4` (used on every device)
+### 1. The film — `hero.mp4` (used on every device)
 
 ```bash
 ffmpeg -i source.mp4 \
@@ -138,7 +138,7 @@ ffmpeg -i source.mp4 \
   -c:v libx264 -profile:v high -crf 23 -preset slow \
   -pix_fmt yuv420p -movflags +faststart \
   -an \
-  hero-desktop.mp4
+  hero.mp4
 ```
 
 ### 2. Still frame — `hero-poster.jpg`
@@ -148,7 +148,7 @@ video for visitors who have switched off animations. Take it from four seconds
 into the video, or use any photo you prefer at 1920 × 1080.
 
 ```bash
-ffmpeg -ss 00:00:04 -i hero-desktop.mp4 -frames:v 1 -q:v 3 hero-poster.jpg
+ffmpeg -ss 00:00:04 -i hero.mp4 -frames:v 1 -q:v 3 hero-poster.jpg
 ```
 
 ### Notes for whoever cuts the video
@@ -159,7 +159,7 @@ ffmpeg -ss 00:00:04 -i hero-desktop.mp4 -frames:v 1 -q:v 3 hero-poster.jpg
 - **`-movflags +faststart` matters.** It moves the index to the front of the
   file so playback begins before the whole thing has downloaded. Without it the
   hero sits blank for several seconds on a slow connection.
-- **Check the file size afterwards.** If `hero-desktop.mp4` came out over 6 MB,
+- **Check the file size afterwards.** If `hero.mp4` came out over 6 MB,
   raise `-crf 23` to `-crf 26` and run it again. Higher number, smaller file,
   slightly softer picture.
 - Avoid fast motion and hard cuts. A slow, steady shot compresses far better and

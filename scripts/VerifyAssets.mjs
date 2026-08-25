@@ -164,7 +164,7 @@ async function makeDummyImage(page, width, height, seed, filename) {
 /** Is the hero video committed? Decides whether a <video> may exist. One file,
     served to phones and desktops alike. */
 const heroVideoUploaded = existsSync(
-  join(root, "public", "assets", "video", "hero-desktop.mp4")
+  join(root, "public", "assets", "video", "hero.mp4")
 );
 
 /**

@@ -215,7 +215,7 @@ export const content = {
        * desktop alike. The framing difference is handled in CSS with
        * object-position, which costs nothing and cannot fail.
        */
-      hero: "/assets/video/hero-desktop.mp4",
+      hero: "/assets/video/hero.mp4",
     },
     images: {
       heroPoster: "/assets/images/hero-poster.jpg",
@@ -268,7 +268,7 @@ content.contact.whatsappUrl = `https://wa.me/${content.contact.whatsapp}?text=${
  */
 export const assetSpecs = {
   // ---- Hero video ----------------------------------------------------------
-  "/assets/video/hero-desktop.mp4": {
+  "/assets/video/hero.mp4": {
     kind: "video",
     w: 1920,
     h: 1080,

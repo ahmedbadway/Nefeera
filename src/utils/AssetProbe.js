@@ -60,7 +60,7 @@ function expectedTypePrefix(path) {
 }
 
 /**
- * @param {string} path Absolute path such as "/assets/video/hero-desktop.mp4".
+ * @param {string} path Absolute path such as "/assets/video/hero.mp4".
  * @returns {Promise<AssetStatus>} "present" only when a real file of the right
  *   type answered; "missing" when the server said so; "unknown" when the
  *   question could not be put to the server at all.
