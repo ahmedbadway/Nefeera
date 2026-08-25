@@ -161,9 +161,10 @@ async function makeDummyImage(page, width, height, seed, filename) {
   return Buffer.from(dataUrl.split(",")[1], "base64");
 }
 
-/** Is a real hero video file committed? Decides whether a <video> may exist. */
-const heroVideoUploaded = ["hero-desktop.mp4", "hero-mobile.mp4", "hero.webm"].some((f) =>
-  existsSync(join(root, "public", "assets", "video", f))
+/** Is the hero video committed? Decides whether a <video> may exist. One file,
+    served to phones and desktops alike. */
+const heroVideoUploaded = existsSync(
+  join(root, "public", "assets", "video", "hero-desktop.mp4")
 );
 
 /**
