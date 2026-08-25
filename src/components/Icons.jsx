@@ -109,23 +109,6 @@ export function WhatsAppIcon({ className = "" }) {
   );
 }
 
-export function PlayIcon({ className = "" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...base}>
-      <path d="M8 5.5l11 6.5-11 6.5z" />
-    </svg>
-  );
-}
-
-export function PauseIcon({ className = "" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...base}>
-      <path d="M9.5 5v14" />
-      <path d="M14.5 5v14" />
-    </svg>
-  );
-}
-
 export function ZoomInIcon({ className = "" }) {
   return (
     <svg viewBox="0 0 24 24" className={className} {...base}>
