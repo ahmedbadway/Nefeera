@@ -218,7 +218,20 @@ export const content = {
       hero: "/assets/video/hero.mp4",
     },
     images: {
-      heroPoster: "/assets/images/hero-poster.jpg",
+      /**
+       * The still that carries the design when the film does not.
+       *
+       * This is not a nicety. A <video> that has not decoded a frame paints
+       * NOTHING, and every glass panel on this site is transparent — so a film
+       * that is slow, refused, or blocked left the whole page as a flat cream
+       * rectangle with no glass and no picture, which is exactly what "the
+       * video does not work on mobile" looked like. The poster is painted by
+       * the browser before a single byte of video is decoded, so the page is
+       * correct from the first frame no matter what playback does afterwards.
+       *
+       * Cut from the film itself at 00:04 so the two never disagree.
+       */
+      heroPoster: "/assets/images/hero-poster.webp",
       logoSvg: "/assets/images/logo.svg",
       logoPng: "/assets/images/logo.png",
       aboutYomna: "/assets/images/about-yomna.webp",
@@ -280,15 +293,15 @@ export const assetSpecs = {
   },
 
   // ---- Hero still ----------------------------------------------------------
-  "/assets/images/hero-poster.jpg": {
+  "/assets/images/hero-poster.webp": {
     kind: "image",
-    w: 1920,
-    h: 1080,
-    ratio: "16/9",
+    w: 464,
+    h: 832,
+    ratio: "464/832",
     maxKB: 300,
     usedIn:
-      "Hero — the still frame shown before the video plays, and instead of it on reduced-motion settings",
-    alt: "A Nefeera wedding at dusk",
+      "Background film — the still shown before the video decodes its first frame, and instead of it whenever playback is refused or the visitor has asked for reduced motion. Cut from the film itself so the two match.",
+    alt: "A Nefeera table setting under a green lantern",
   },
 
   // ---- Logo ----------------------------------------------------------------

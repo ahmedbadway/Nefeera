@@ -53,7 +53,7 @@ with the same name and GitHub will offer to replace it.
 
 | File name | Put it in | Exact size (pixels) | Shape | Max file size | Where it shows on the page |
 | --- | --- | --- | --- | --- | --- |
-| `hero-poster.jpg` | `assets/images/` | 1920 × 1080 | Wide (16:9) | 300 KB | Hero — the still frame shown before the video plays, and instead of it on reduced-motion settings |
+| `hero-poster.webp` | `assets/images/` | 464 × 832 | 464/832 | 300 KB | Background film — the still shown before the video decodes its first frame, and instead of it whenever playback is refused or the visitor has asked for reduced motion. Cut from the film itself so the two match. |
 | `about-yomna.webp` | `assets/images/` | 1200 × 1200 | Square (1:1) | 300 KB | About section — portrait of Yomna El Hadad |
 | `case-01.webp` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 450 KB | Featured wedding — the opening image, beside the introduction copy |
 | `case-02.webp` | `assets/images/` | 1080 × 1920 | Tall phone (9:16) | 400 KB | Featured wedding — first image in the row of three |
@@ -141,14 +141,17 @@ ffmpeg -i source.mp4 \
   hero.mp4
 ```
 
-### 2. Still frame — `hero-poster.jpg`
+### 2. Still frame — `hero-poster.webp`
 
-This is the image shown before the video starts playing, and instead of the
-video for visitors who have switched off animations. Take it from four seconds
-into the video, or use any photo you prefer at 1920 × 1080.
+**Do not skip this one.** It is the image the browser paints before a single
+byte of video has been decoded, and it is what the whole page rests on whenever
+playback is slow, refused, or switched off — every glass panel on this site is
+transparent, so with neither film nor still the page is a flat cream rectangle.
+Cut it from the film itself so the two never disagree.
 
 ```bash
-ffmpeg -ss 00:00:04 -i hero.mp4 -frames:v 1 -q:v 3 hero-poster.jpg
+ffmpeg -ss 00:00:04 -i hero.mp4 -frames:v 1 -y frame.png
+cwebp -q 82 frame.png -o hero-poster.webp
 ```
 
 ### Notes for whoever cuts the video
@@ -203,9 +206,8 @@ cwebp -q 82 my-photo.jpg -o gallery-01.webp
 Do not rename a `.jpg` file to `.webp` by hand — that produces a broken file
 that will not display. Convert it properly.
 
-The one exception is the video still frame, `hero-poster.jpg`, which stays a
-JPEG: it is also used as the preview image when the site is shared on WhatsApp
-and Facebook, and those expect a JPEG.
+That includes the video still frame, `hero-poster.webp` — it is displayed by
+the browser like any other image, so it follows the same rule.
 
 ---
 

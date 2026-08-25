@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { getAssetSpec, getAssetRequirementLabel, getAssetFilename } from "../data/Content.js";
 import { buildPlaceholderSvg } from "../utils/PlaceholderSvg.js";
-import { probeAsset } from "../utils/AssetProbe.js";
 import { resolveAssetPath } from "../utils/ResolveAssetPath.js";
 
 // The gestures that lift iOS's Low Power Mode autoplay block.
@@ -85,28 +84,26 @@ export default function VideoAsset({
 }) {
   const prefersReducedMotion = useReducedMotion();
 
-  // Poster only. The VIDEO is never gated on a probe — that was the bug.
-  const [posterStatus, setPosterStatus] = useState(null);
   const [playbackFailed, setPlaybackFailed] = useState(false);
   const [posterFailed, setPosterFailed] = useState(false);
   const errorCount = useRef(0);
   const fallbackVideoRef = useRef(null);
   const resolvedVideoRef = videoRef || fallbackVideoRef;
 
-  useEffect(() => {
-    let active = true;
-
-    probeAsset(poster).then((status) => {
-      if (active) setPosterStatus(status);
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [poster]);
-
+  // NOTHING IS PROBED HERE ANY MORE, AND THAT IS THE POINT.
+  //
+  // The poster used to wait on a HEAD request before it was allowed onto the
+  // element, which made it useless for the one job it has: covering the gap
+  // before the first video frame decodes. That gap is at its widest in exactly
+  // the first moment, and the probe guaranteed the poster arrived after it.
+  //
+  // A `poster` attribute pointing at a file that is not there costs nothing —
+  // the browser paints no poster and shows no broken-image chrome, which is
+  // the same outcome the probe was buying at the price of a round trip. So it
+  // goes on the element immediately, and only the <img> fallback below (used
+  // once the video has been retired) needs an onError at all.
   const videoAvailable = Boolean(src) && !playbackFailed;
-  const posterAvailable = posterStatus === "present" && !posterFailed;
+  const posterAvailable = Boolean(poster) && !posterFailed;
 
   // The film loops continuously, with one exception: prefers-reduced-motion.
   // A visitor who has asked their OS to stop moving interfaces is not asking
